@@ -1,22 +1,27 @@
 package com.gmail.maciekhtc.offroadmaps;
 
 import android.location.Location;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private String filePath = Environment.getExternalStorageDirectory() + "OffroadMapCoordinates" + ".txt";
+    private boolean followMyPosition = true;
+    private String filePath = Environment.getExternalStorageDirectory() + "/OffroadMapCoordinates" + ".txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,16 +40,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String line = "";
             while ((line = br.readLine()) != null) {
                 //Read line
-                Log.d("OffroadMap","read line");
+                Log.d("OffroadMap", "Read line");
             }
             Log.d("OffroadMap","File loaded");
         } catch (FileNotFoundException e1) {
             //No file
-            Log.d("OffroadMap","No file");
-            FileWriter fileWriter = new FileWriter(filePath, true);
-            fileWriter.write("#Offroad Map points list, you can share this list with others, even small fragments");
-            fileWriter.close();
-            Log.d("OffroadMap","File created");
+            Log.d("OffroadMap", "No file");
+            try {
+                FileWriter fileWriter = new FileWriter(filePath, true);
+                Log.d("OffroadMap", "File created");
+                fileWriter.write("#Offroad Map points list, you can share this list with others, even small fragments");
+                fileWriter.close();
+                Log.d("OffroadMap", "File header write ended");
+            } catch (IOException e) {
+                //IOException
+                Log.d("OffroadMap", "Can not create file");
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            //IOException
+            Log.d("OffroadMap", "Can not read file");
+            e.printStackTrace();
         }
 
 
@@ -72,7 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
-                //mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
+                if (followMyPosition) mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
             }
         });
     }

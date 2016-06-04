@@ -10,7 +10,6 @@ import com.google.android.gms.maps.model.LatLng;
 public class MapUtils {
     public static Location locFromLatLng(LatLng input)
     {
-        Location res = new Location("",)
         Location result = new Location("");
         result.setLatitude(input.latitude);
         result.setLongitude(input.longitude);
