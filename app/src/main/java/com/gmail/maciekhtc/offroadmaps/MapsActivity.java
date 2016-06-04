@@ -14,6 +14,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private File textFileFromSD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +24,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-    }
+
+        //
+
+        BufferedReader br = null;
+        try {
+            String fpath = Environment.getExternalStorageDirectory() + "OffroadMapCoordinates" + ".txt";
+            try {
+                br = new BufferedReader(new FileReader(fpath));
+            } catch (FileNotFoundException e1) {
+                //No file
+            }
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                //Do something here
+            }
+
+
+
+        }
 
 
     /**
