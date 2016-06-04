@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.WindowManager;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -24,6 +25,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String filePath = Environment.getExternalStorageDirectory() + "/OffroadMapCoordinates" + ".txt";
 
     @Override
+    protected void onStop() {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        super.onStop();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
@@ -32,6 +39,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        //
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //
 
         BufferedReader br = null;
