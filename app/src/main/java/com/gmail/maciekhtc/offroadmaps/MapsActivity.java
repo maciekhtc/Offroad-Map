@@ -11,10 +11,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.FileWriter;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private File textFileFromSD;
+    private String filePath = Environment.getExternalStorageDirectory() + "OffroadMapCoordinates" + ".txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,20 +31,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         BufferedReader br = null;
         try {
-            String fpath = Environment.getExternalStorageDirectory() + "OffroadMapCoordinates" + ".txt";
-            try {
-                br = new BufferedReader(new FileReader(fpath));
-            } catch (FileNotFoundException e1) {
-                //No file
-            }
+            br = new BufferedReader(new FileReader(filePath));
             String line = "";
             while ((line = br.readLine()) != null) {
-                //Do something here
+                //Read line
+                Log.d("OffroadMap","read line");
             }
-
-
-
+            Log.d("OffroadMap","File loaded");
+        } catch (FileNotFoundException e1) {
+            //No file
+            Log.d("OffroadMap","No file");
+            FileWriter fileWriter = new FileWriter(filePath, true);
+            fileWriter.write("#Offroad Map points list, you can share this list with others, even small fragments");
+            fileWriter.close();
+            Log.d("OffroadMap","File created");
         }
+
+
+    }
 
 
     /**
