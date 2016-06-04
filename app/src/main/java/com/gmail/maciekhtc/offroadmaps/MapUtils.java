@@ -1,0 +1,23 @@
+package com.gmail.maciekhtc.offroadmaps;
+
+import android.location.Location;
+
+import com.google.android.gms.maps.model.LatLng;
+
+/**
+ * Created by 15936 on 04.06.2016.
+ */
+public class MapUtils {
+    public static Location locFromLatLng(LatLng input)
+    {
+        Location res = new Location("",)
+        Location result = new Location("");
+        result.setLatitude(input.latitude);
+        result.setLongitude(input.longitude);
+        return result;
+    }
+    public static LatLng latlngFromLocation(Location input)
+    {
+        return new LatLng(input.getLatitude(),input.getLongitude());
+    }
+}
