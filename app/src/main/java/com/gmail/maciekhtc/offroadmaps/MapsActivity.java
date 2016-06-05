@@ -25,10 +25,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private boolean followMyPosition = true;
-    private String filePath = Environment.getExternalStorageDirectory() + "/OffroadMapCoordinates" + ".txt";
 
     @Override
     protected void onStop() {
+        PointUtils.savePoints();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.onStop();
     }
@@ -55,7 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //
 
-        ArrayList<String> listString = FileUtils.fileInit(filePath);
+        PointUtils.pointsFromFile();
 
 
 

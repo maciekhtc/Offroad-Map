@@ -1,5 +1,6 @@
 package com.gmail.maciekhtc.offroadmaps;
 
+import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -13,7 +14,9 @@ import java.util.ArrayList;
  * Created by 15936 on 05.06.2016.
  */
 public class FileUtils {
-    public static ArrayList<String> fileInit(String filePath)
+    private static String filePath = Environment.getExternalStorageDirectory() + "/OffroadMapCoordinates" + ".txt";
+
+    public static ArrayList<String> fileInit()
     {
         ArrayList<String> listString = new ArrayList();
         try {
@@ -50,7 +53,7 @@ public class FileUtils {
         return listString;
     }
 
-    public static void fileWriteLines(ArrayList<String> newLines, String filePath) {
+    public static void fileWriteLines(ArrayList<String> newLines) {
         try {
             FileWriter fileWriter = new FileWriter(filePath, true);
             Log.d("OffroadMap", "File opened for append");
