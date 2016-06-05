@@ -37,7 +37,7 @@ public class FileUtils {
             try {
                 FileWriter fileWriter = new FileWriter(filePath, true);
                 Log.d("OffroadMap", "File created");
-                fileWriter.write("#Offroad Map points list, you can share this list with others, even small fragments");
+                fileWriter.write("#Offroad Map points list, you can share this list with others");
                 fileWriter.close();
                 Log.d("OffroadMap", "File header write ended");
             } catch (IOException e) {
@@ -59,7 +59,7 @@ public class FileUtils {
             Log.d("OffroadMap", "File opened for append");
             for (String line: newLines)
             {
-                fileWriter.write(line);
+                fileWriter.write(line+"\r\n");
             }
             fileWriter.close();
             Log.d("OffroadMap", "File filled with new lines");
