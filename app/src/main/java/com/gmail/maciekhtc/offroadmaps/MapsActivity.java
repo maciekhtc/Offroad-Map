@@ -84,6 +84,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMyLocationChange(Location location) {
                 if (followMyPosition) mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
+                Log.d("OffroadMap","Location changed: "+MapUtils.latlngFromLocation(location).latitude+":"+MapUtils.latlngFromLocation(location).longitude);
+                PointUtils.addNewPoint(location);
             }
         });
     }

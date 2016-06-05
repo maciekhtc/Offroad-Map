@@ -1,5 +1,7 @@
 package com.gmail.maciekhtc.offroadmaps;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -26,8 +28,12 @@ public class PointUtils {
         ArrayList<String> listString = new ArrayList();
         for (LatLng point: newPoints)
         {
-            listString.add(point.toString());
+            listString.add(point.latitude+":"+point.longitude);
         }
         FileUtils.fileWriteLines(listString);
+    }
+
+    public static void addNewPoint(Location location) {
+        newPoints.add(MapUtils.latlngFromLocation(location));
     }
 }
