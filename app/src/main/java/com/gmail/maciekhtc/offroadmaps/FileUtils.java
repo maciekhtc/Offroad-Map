@@ -13,13 +13,18 @@ import java.util.ArrayList;
  * Created by 15936 on 05.06.2016.
  */
 public class FileUtils {
-    public static void fileInit(String filePath)
+    public static ArrayList<String> fileInit(String filePath)
     {
+        ArrayList<String> listString = new ArrayList();
         try {
             BufferedReader br = new BufferedReader(new FileReader(filePath));
             String line = "";
             while ((line = br.readLine()) != null) {
                 //Read line
+                if (!line.startsWith("#"))
+                {
+                    listString.add(new String(line));
+                }
                 Log.d("OffroadMap", "Read line");
             }
             Log.d("OffroadMap","File loaded");
@@ -42,5 +47,6 @@ public class FileUtils {
             Log.d("OffroadMap", "Can not read file");
             e.printStackTrace();
         }
+        return listString;
     }
 }
