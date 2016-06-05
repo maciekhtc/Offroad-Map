@@ -54,34 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //
 
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(filePath));
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                //Read line
-                Log.d("OffroadMap", "Read line");
-            }
-            Log.d("OffroadMap","File loaded");
-        } catch (FileNotFoundException e1) {
-            //No file
-            Log.d("OffroadMap", "No file");
-            try {
-                FileWriter fileWriter = new FileWriter(filePath, true);
-                Log.d("OffroadMap", "File created");
-                fileWriter.write("#Offroad Map points list, you can share this list with others, even small fragments");
-                fileWriter.close();
-                Log.d("OffroadMap", "File header write ended");
-            } catch (IOException e) {
-                //IOException
-                Log.d("OffroadMap", "Can not create file");
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            //IOException
-            Log.d("OffroadMap", "Can not read file");
-            e.printStackTrace();
-        }
+        FileUtils.fileInit(filePath);
 
 
     }
