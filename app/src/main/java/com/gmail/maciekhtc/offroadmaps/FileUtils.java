@@ -65,7 +65,7 @@ public class FileUtils {
             Log.d("OffroadMap", "File filled with new lines");
         } catch (IOException e) {
             //IOException
-            Log.d("OffroadMap", "Can append to file");
+            Log.d("OffroadMap", "Can not append to file");
             e.printStackTrace();
         }
     }
