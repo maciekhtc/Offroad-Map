@@ -37,7 +37,7 @@ public class FileUtils {
             try {
                 FileWriter fileWriter = new FileWriter(filePath, true);
                 Log.d("OffroadMap", "File created");
-                fileWriter.write("#Offroad Map points list, you can share this list with others");
+                fileWriter.write("#Offroad Map points list, you can share this list with others\r\n");
                 fileWriter.close();
                 Log.d("OffroadMap", "File header write ended");
             } catch (IOException e) {

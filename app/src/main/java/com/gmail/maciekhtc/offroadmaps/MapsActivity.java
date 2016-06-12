@@ -25,6 +25,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private boolean followMyPosition = true;
+    private boolean saveNewPoints = false;
+    private boolean updateOnline = true;
+    private PositionThread positionThread = null;
 
     @Override
     protected void onStop() {
@@ -48,7 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 //action
-                Log.d("OffroadMap","Button Pressed");
+                Log.d("OffroadMap", "Button Pressed");
             }
         });
         //
@@ -56,7 +59,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //
 
         PointUtils.pointsFromFile();
-
+        positionThread = new PositionThread();
+        positionThread.username="macoo";    //get from textbox?
+        positionThread.start();
 
 
     }
@@ -84,8 +89,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMyLocationChange(Location location) {
                 if (followMyPosition) mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
-                Log.d("OffroadMap","Location changed: "+MapUtils.latlngFromLocation(location).latitude+":"+MapUtils.latlngFromLocation(location).longitude);
-                PointUtils.addNewPoint(location);
+                if (saveNewPoints) PointUtils.addNewPoint(location);
+                if (updateOnline)
+                {
+                    positionThread.myLat=location.getLatitude();
+                    positionThread.myLon=location.getLongitude();
+                }
+                Log.d("OffroadMap","My location changed: "+location.getLatitude()+":"+location.getLongitude());
             }
         });
     }

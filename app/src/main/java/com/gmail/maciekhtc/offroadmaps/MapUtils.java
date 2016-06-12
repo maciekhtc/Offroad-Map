@@ -4,10 +4,14 @@ import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.HashMap;
+
 /**
  * Created by 15936 on 04.06.2016.
  */
 public class MapUtils {
+    public static HashMap<String,User> userList = new HashMap<>();
+
     public static Location locFromLatLng(LatLng input)
     {
         Location result = new Location("");
