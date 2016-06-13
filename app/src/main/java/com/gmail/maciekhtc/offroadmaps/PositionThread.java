@@ -65,7 +65,8 @@ public class PositionThread extends Thread {
                 "&username="+Settings.username+
                 "&lat="+myLat+
                 "&lon="+myLon+
-                "&group="+Settings.group;
+                "&group="+Settings.group+
+                "&msg="+"";
                 //add message
     }
     private void updateUsers() {
