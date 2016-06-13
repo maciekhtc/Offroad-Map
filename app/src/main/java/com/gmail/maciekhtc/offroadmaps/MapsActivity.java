@@ -13,6 +13,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -31,6 +33,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onStop() {
+        positionThread.running = false;
         PointUtils.savePoints();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.onStop();
@@ -79,7 +82,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        MapUtils.mMap = googleMap;
 
         mMap.setMyLocationEnabled(true);
         //mMap.addPolyline()
@@ -89,15 +91,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
-                if (followMyPosition) mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
+                if (followMyPosition)
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
                 if (saveNewPoints) PointUtils.addNewPoint(location);
-                if (updateOnline)
-                {
-                    positionThread.myLat=location.getLatitude();
-                    positionThread.myLon=location.getLongitude();
+                if (updateOnline) {
+                    positionThread.myLat = location.getLatitude();
+                    positionThread.myLon = location.getLongitude();
                 }
-                Log.d("OffroadMap","My location changed: "+location.getLatitude()+":"+location.getLongitude());
+                //Log.d("OffroadMap","My location changed: "+location.getLatitude()+":"+location.getLongitude());
+                MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
             }
         });
+        MapUtils.mMap = this.mMap;
     }
 }

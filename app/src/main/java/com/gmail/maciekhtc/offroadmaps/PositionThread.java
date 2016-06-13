@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 
 /**
  * Created by 15936 on 12.06.2016.
@@ -29,6 +30,8 @@ public class PositionThread extends Thread {
             Build.MODEL.length()%10 + Build.PRODUCT.length()%10 +
             Build.TAGS.length()%10 + Build.TYPE.length()%10 +
             Build.USER.length()%10 ;
+    public boolean running = true;
+
     //
     public void run() {
         while (true) {
@@ -48,7 +51,8 @@ public class PositionThread extends Thread {
                     urlConnection.disconnect();
                 }
                 try {
-                    Thread.sleep(5000); //wait 5 sec each refresh
+                    Thread.sleep(3000); //wait 3 sec each refresh
+                    if (!running) break;        //exit statement
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -66,15 +70,15 @@ public class PositionThread extends Thread {
     private void updateUsers() {
         for (String userLine : users.split("<br/>"))
         {
-            String []userParams = userLine.split(":");
-            if (MapUtils.userList.containsKey(userParams[0]))   //0 - unique id
+            String userParams[] = userLine.split(":");
+            if (MapUtils.userList.get(userParams[0]) != null)   //0 - unique id
             {
-                Log.d("OffroadMap", "Online User updated");
-                MapUtils.userList.get(userParams[0]).setParams(userParams[1],userParams[2],userParams[3],userParams[4]);
+                //Log.d("OffroadMap", "Online User updated");
+                MapUtils.userList.get(userParams[0]).setParams(userParams[1], userParams[2], userParams[3], userParams[4]);
             }
             else if (userLine.contains(":")) {
                 Log.d("OffroadMap", "Online User created");
-                MapUtils.userList.put(userParams[0],new User(userParams[1],userParams[2],userParams[3],userParams[4]));
+                MapUtils.userList.put(userParams[0], new User(userParams[1], userParams[2], userParams[3], userParams[4]));
             }
         }
 
