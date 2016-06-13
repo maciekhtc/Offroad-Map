@@ -24,13 +24,13 @@ public class PointUtils {
         }
     }
 
-    public static void savePoints() {
+    public static ArrayList<String> savePoints() {
         ArrayList<String> listString = new ArrayList();
         for (LatLng point: newPoints)
         {
             listString.add(point.latitude+":"+point.longitude);
         }
-        FileUtils.fileWriteLines(listString);
+        return listString;
     }
 
     public static void addNewPoint(Location location) {

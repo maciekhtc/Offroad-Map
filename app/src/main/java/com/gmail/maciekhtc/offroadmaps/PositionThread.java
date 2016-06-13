@@ -16,7 +16,6 @@ public class PositionThread extends Thread {
     //
     public double myLat = 0;
     public double myLon = 0;
-    public String username = "";
     public String users = "";
     //
     private URL url;
@@ -63,9 +62,11 @@ public class PositionThread extends Thread {
     private String generateRequestUrl() {
         return "http://student.pwsz.elblag.pl/~15936/OffroadMap/getUsers.php"+
                 "?deviceId="+deviceId+
-                "&username="+username+
+                "&username="+Settings.username+
                 "&lat="+myLat+
-                "&lon="+myLon;
+                "&lon="+myLon+
+                "&group="+Settings.group;
+                //add message
     }
     private void updateUsers() {
         for (String userLine : users.split("<br/>"))
@@ -73,11 +74,9 @@ public class PositionThread extends Thread {
             String userParams[] = userLine.split(":");
             if (MapUtils.userList.get(userParams[0]) != null)   //0 - unique id
             {
-                //Log.d("OffroadMap", "Online User updated");
                 MapUtils.userList.get(userParams[0]).setParams(userParams[1], userParams[2], userParams[3], userParams[4]);
             }
             else if (userLine.contains(":")) {
-                Log.d("OffroadMap", "Online User created");
                 MapUtils.userList.put(userParams[0], new User(userParams[1], userParams[2], userParams[3], userParams[4]));
             }
         }

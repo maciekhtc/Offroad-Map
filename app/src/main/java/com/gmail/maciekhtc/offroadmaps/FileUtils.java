@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -14,28 +15,60 @@ import java.util.ArrayList;
  * Created by 15936 on 05.06.2016.
  */
 public class FileUtils {
-    private static String filePath = Environment.getExternalStorageDirectory() + "/OffroadMapCoordinates" + ".txt";
+    private static String filePath = Environment.getExternalStorageDirectory() + "/OffroadMap/";
 
     public static ArrayList<String> fileInit()
     {
         ArrayList<String> listString = new ArrayList();
         try {
-            BufferedReader br = new BufferedReader(new FileReader(filePath));
+            BufferedReader mapBr = new BufferedReader(new FileReader(filePath+"Map.txt"));
             String line = "";
-            while ((line = br.readLine()) != null) {
-                //Read line
+            while ((line = mapBr.readLine()) != null) {
                 if (!line.startsWith("#"))
                 {
                     listString.add(new String(line));
+
                 }
-                Log.d("OffroadMap", "Read line");
             }
-            Log.d("OffroadMap","File loaded");
+            //
+            BufferedReader settingsBr = new BufferedReader(new FileReader(filePath+"Settings.txt"));
+            line = "";
+            while ((line = settingsBr.readLine()) != null) {
+                //Read line
+                if (line.startsWith("username:"))
+                {
+                    Settings.username = line.split(":")[1];
+                }
+                else if (line.startsWith("group:"))
+                {
+                    Settings.group = line.split(":")[1];
+                }
+                else if (line.startsWith("followMyPosition:"))
+                {
+                    if (line.split(":")[1].contains("true") || line.split(":")[1].contains("1"))
+                        Settings.followMyPosition = true;
+                    else Settings.followMyPosition = false;
+                }
+                else if (line.startsWith("saveNewPoints:"))
+                {
+                    if (line.split(":")[1].contains("true") || line.split(":")[1].contains("1"))
+                        Settings.saveNewPoints = true;
+                    else Settings.saveNewPoints = false;
+                }
+                else if (line.startsWith("updateOnline:"))
+                {
+                    if (line.split(":")[1].contains("true") || line.split(":")[1].contains("1"))
+                        Settings.updateOnline = true;
+                    else Settings.updateOnline = false;
+                }
+            }
+            Log.d("OffroadMap","Files loaded");
         } catch (FileNotFoundException e1) {
             //No file
             Log.d("OffroadMap", "No file");
             try {
-                FileWriter fileWriter = new FileWriter(filePath, true);
+                new File(filePath).mkdirs();
+                FileWriter fileWriter = new FileWriter(filePath+"Map.txt", true);
                 Log.d("OffroadMap", "File created");
                 fileWriter.write("#Offroad Map points list, you can share this list with others\r\n");
                 fileWriter.close();
@@ -53,11 +86,11 @@ public class FileUtils {
         return listString;
     }
 
-    public static void fileWriteLines(ArrayList<String> newLines) {
+    public static void fileWriteLines() {
         try {
-            FileWriter fileWriter = new FileWriter(filePath, true);
+            FileWriter fileWriter = new FileWriter(filePath+"Map.txt", true);
             Log.d("OffroadMap", "File opened for append");
-            for (String line: newLines)
+            for (String line: PointUtils.savePoints())
             {
                 fileWriter.write(line+"\r\n");
             }
@@ -66,6 +99,22 @@ public class FileUtils {
         } catch (IOException e) {
             //IOException
             Log.d("OffroadMap", "Can not append to file");
+            e.printStackTrace();
+        }
+    }
+    public static void fileWriteSettings() {
+        try {
+            FileWriter fileWriter = new FileWriter(filePath+"Settings.txt", false);
+            fileWriter.write("username:"+ Settings.username +"\r\n");
+            fileWriter.write("group:"+ Settings.group +"\r\n");
+            fileWriter.write("followMyPosition:"+ Settings.followMyPosition +"\r\n");
+            fileWriter.write("saveNewPoints:"+ Settings.saveNewPoints +"\r\n");
+            fileWriter.write("updateOnline:"+ Settings.updateOnline +"\r\n");
+            fileWriter.close();
+            Log.d("OffroadMap", "Settings saved");
+        } catch (IOException e) {
+            //IOException
+            Log.d("OffroadMap", "Can not save settings");
             e.printStackTrace();
         }
     }

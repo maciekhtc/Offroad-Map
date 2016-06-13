@@ -26,17 +26,20 @@ import java.util.ArrayList;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private boolean followMyPosition = true;
-    private boolean saveNewPoints = false;
-    private boolean updateOnline = true;
     private PositionThread positionThread = null;
 
     @Override
     protected void onStop() {
         positionThread.running = false;
-        PointUtils.savePoints();
+        FileUtils.fileWriteSettings();
+        FileUtils.fileWriteLines();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.onStop();
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
@@ -63,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         PointUtils.pointsFromFile();
         positionThread = new PositionThread();
-        positionThread.username="macoo";    //get from textbox?
+        //positionThread.username="macoo";    //get from textbox?
         positionThread.start();
 
 
@@ -91,10 +94,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
-                if (followMyPosition)
+                if (Settings.followMyPosition)
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
-                if (saveNewPoints) PointUtils.addNewPoint(location);
-                if (updateOnline) {
+                if (Settings.saveNewPoints) PointUtils.addNewPoint(location);
+                if (Settings.updateOnline) {
                     positionThread.myLat = location.getLatitude();
                     positionThread.myLon = location.getLongitude();
                 }
