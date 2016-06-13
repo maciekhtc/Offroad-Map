@@ -29,13 +29,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private PositionThread positionThread = null;
 
     @Override
-    protected void onStop() {
+    public void onBackPressed() {                                                           //zabij proces przy wylaczaniu aplikacji klawiszem back
         positionThread.running = false;
         FileUtils.fileWriteSettings();
         FileUtils.fileWriteLines();
+        super.onBackPressed();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        super.onStop();
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -85,6 +87,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        MapUtils.mMap = this.mMap;
 
         mMap.setMyLocationEnabled(true);
         //mMap.addPolyline()
@@ -101,10 +104,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     positionThread.myLat = location.getLatitude();
                     positionThread.myLon = location.getLongitude();
                 }
-                //Log.d("OffroadMap","My location changed: "+location.getLatitude()+":"+location.getLongitude());
                 MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
             }
         });
-        MapUtils.mMap = this.mMap;
     }
 }
