@@ -13,9 +13,8 @@ public class PointUtils {
     public static ArrayList<LatLng> filePoints = new ArrayList();
     public static ArrayList<LatLng> newPoints = new ArrayList();
 
-    public static void pointsFromFile()
+    public static void pointsFromFile(ArrayList<String> listString)
     {
-        ArrayList<String> listString = FileUtils.fileInit();
         String []LatLngfromLine = new String[2];
         for (String line: listString)
         {

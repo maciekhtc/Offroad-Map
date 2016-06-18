@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,10 +32,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private PositionThread positionThread = null;
     RelativeLayout standardOverlay;
     RelativeLayout settingsOverlay;
+    EditText usernameText;
+    EditText groupText;
+    CheckBox followMyPositionCheckBox;
+    CheckBox saveNewPointsCheckBox;
+    CheckBox updateOnlineCheckBox;
 
 
     @Override
     public void onBackPressed() {                                                           //zabij proces przy wylaczaniu aplikacji klawiszem back
+        if (settingsOverlay.isShown())
+        {
+            settingsOverlay.setVisibility(View.GONE);
+            standardOverlay.setVisibility(View.VISIBLE);
+        }
         positionThread.running = false;
         FileUtils.fileWriteSettings();
         FileUtils.fileWriteLines();
@@ -57,30 +69,77 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        standardOverlay = (RelativeLayout) findViewById(R.id.standartOverlay);
+        standardOverlay = (RelativeLayout) findViewById(R.id.standardOverlay);
         settingsOverlay = (RelativeLayout) findViewById(R.id.settingsOverlay);
+        usernameText = (EditText) findViewById(R.id.usernameText);
+        groupText = (EditText) findViewById(R.id.groupText);
+        followMyPositionCheckBox = (CheckBox) findViewById(R.id.followMyPositionCheckBox);
+        saveNewPointsCheckBox = (CheckBox) findViewById(R.id.saveNewPointsCheckBox);
+        updateOnlineCheckBox = (CheckBox) findViewById(R.id.updateOnlineCheckBox);
 
         Button closeSettingsButton = (Button) findViewById(R.id.closeSettingsButton);
         closeSettingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //action
-                Log.d("OffroadMap", "Button Pressed = closeSettingsButton");
+                settingsOverlay.setVisibility(View.GONE);
+                standardOverlay.setVisibility(View.VISIBLE);
             }
         });
-
+        Button settingsButton = (Button) findViewById(R.id.settingsButton);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                standardOverlay.setVisibility(View.GONE);
+                settingsOverlay.setVisibility(View.VISIBLE);
+            }
+        });
+        Button saveButton = (Button) findViewById(R.id.saveButton);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //save
+                saveSettings();
+                settingsOverlay.setVisibility(View.GONE);
+                standardOverlay.setVisibility(View.VISIBLE);
+            }
+        });
+        Button messageButton = (Button) findViewById(R.id.messageButton);
+        messageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //message
+            }
+        });
 
 
         //
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //
 
-        PointUtils.pointsFromFile();
+        PointUtils.pointsFromFile(FileUtils.fileInit());
+        //
+        loadSettings();
         positionThread = new PositionThread();
         //positionThread.username="macoo";    //get from textbox?
         positionThread.start();
 
 
+    }
+
+    private void saveSettings() {
+        Settings.username = usernameText.getText().toString();
+        Settings.group = groupText.getText().toString();
+        Settings.followMyPosition = followMyPositionCheckBox.isSelected();
+        Settings.saveNewPoints = saveNewPointsCheckBox.isSelected();
+        Settings.updateOnline = updateOnlineCheckBox.isSelected();
+    }
+
+    private void loadSettings() {
+        usernameText.setText(Settings.username);
+        groupText.setText(Settings.group);
+        followMyPositionCheckBox.setSelected(Settings.followMyPosition);
+        saveNewPointsCheckBox.setSelected(Settings.saveNewPoints);
+        updateOnlineCheckBox.setSelected(Settings.updateOnline);
     }
 
 
