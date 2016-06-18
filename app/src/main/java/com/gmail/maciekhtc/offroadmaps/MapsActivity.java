@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,6 +28,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private PositionThread positionThread = null;
+    RelativeLayout standardOverlay;
+    RelativeLayout settingsOverlay;
+
 
     @Override
     public void onBackPressed() {                                                           //zabij proces przy wylaczaniu aplikacji klawiszem back
@@ -53,15 +57,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        standardOverlay = (RelativeLayout) findViewById(R.id.standartOverlay);
+        settingsOverlay = (RelativeLayout) findViewById(R.id.settingsOverlay);
 
-        Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
+        Button closeSettingsButton = (Button) findViewById(R.id.closeSettingsButton);
+        closeSettingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //action
-                Log.d("OffroadMap", "Button Pressed");
+                Log.d("OffroadMap", "Button Pressed = closeSettingsButton");
             }
         });
+
+
+
         //
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //
