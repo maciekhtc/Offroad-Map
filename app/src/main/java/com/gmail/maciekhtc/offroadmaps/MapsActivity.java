@@ -46,12 +46,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             settingsOverlay.setVisibility(View.GONE);
             standardOverlay.setVisibility(View.VISIBLE);
         }
-        positionThread.running = false;
-        FileUtils.fileWriteSettings();
-        FileUtils.fileWriteLines();
-        super.onBackPressed();
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        android.os.Process.killProcess(android.os.Process.myPid());
+        else {
+            positionThread.running = false;
+            FileUtils.fileWriteSettings();
+            FileUtils.fileWriteLines();
+            super.onBackPressed();
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            android.os.Process.killProcess(android.os.Process.myPid());
+        }
     }
 
     @Override
@@ -68,6 +70,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        //
+        PointUtils.pointsFromFile(FileUtils.fileInit());
+        //
 
         standardOverlay = (RelativeLayout) findViewById(R.id.standardOverlay);
         settingsOverlay = (RelativeLayout) findViewById(R.id.settingsOverlay);
@@ -108,6 +113,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 //message
+                Log.d("OffroadMap", "Message");
             }
         });
 
@@ -116,11 +122,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //
 
-        PointUtils.pointsFromFile(FileUtils.fileInit());
-        //
+
         loadSettings();
         positionThread = new PositionThread();
-        //positionThread.username="macoo";    //get from textbox?
         positionThread.start();
 
 
@@ -129,17 +133,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void saveSettings() {
         Settings.username = usernameText.getText().toString();
         Settings.group = groupText.getText().toString();
-        Settings.followMyPosition = followMyPositionCheckBox.isSelected();
-        Settings.saveNewPoints = saveNewPointsCheckBox.isSelected();
-        Settings.updateOnline = updateOnlineCheckBox.isSelected();
+        Settings.followMyPosition = followMyPositionCheckBox.isChecked();
+        Settings.saveNewPoints = saveNewPointsCheckBox.isChecked();
+        Settings.updateOnline = updateOnlineCheckBox.isChecked();
+        Log.d("OffroadMap", "Settings saved");
     }
 
     private void loadSettings() {
         usernameText.setText(Settings.username);
         groupText.setText(Settings.group);
-        followMyPositionCheckBox.setSelected(Settings.followMyPosition);
-        saveNewPointsCheckBox.setSelected(Settings.saveNewPoints);
-        updateOnlineCheckBox.setSelected(Settings.updateOnline);
+        followMyPositionCheckBox.setChecked(Settings.followMyPosition);
+        saveNewPointsCheckBox.setChecked(Settings.saveNewPoints);
+        updateOnlineCheckBox.setChecked(Settings.updateOnline);
+        Log.d("OffroadMap", "Settings loaded");
     }
 
 
