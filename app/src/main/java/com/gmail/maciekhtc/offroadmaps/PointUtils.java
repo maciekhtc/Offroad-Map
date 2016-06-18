@@ -33,6 +33,6 @@ public class PointUtils {
     }
 
     public static void addNewPoint(Location location) {
-        newPoints.add(MapUtils.latlngFromLocation(location));
+        if (location.getAccuracy()<20) newPoints.add(MapUtils.latlngFromLocation(location));
     }
 }
