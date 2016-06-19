@@ -30,15 +30,32 @@ public class PointUtils {
 
     public static LinkedList<String> savePoints() {
         LinkedList<String> listString = new LinkedList();
-        for (LatLng point: newPoints)
+        for (LatLng newPoint: newPoints)
         {
-            listString.add(point.latitude+":"+point.longitude);
+            listString.add(newPoint.latitude+":"+newPoint.longitude);
         }
         return listString;
     }
 
     public static void addNewPoint(Location location) {
-        newPoints.add(MapUtils.latlngFromLocation(location));
+        LatLng newPoint = MapUtils.latlngFromLocation(location);
+        boolean addFlag = true;
+        //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
+        for (LinkedList<LatLng> line:lines)
+        {
+            for (LatLng existingPoint:line)
+            {
+                if (isDistanceSmall(existingPoint,newPoint,0.005))
+                {
+                    //todo: update existing point by measuring average from new point which is near and old value of existing point
+                    addFlag=false;
+                    break;
+                }
+            }
+            break;
+        }
+        if (addFlag) newPoints.add(newPoint);
+
     }
 
     private static boolean isDistanceSmall(LatLng loc1, LatLng loc2, double highestAcceptable)
