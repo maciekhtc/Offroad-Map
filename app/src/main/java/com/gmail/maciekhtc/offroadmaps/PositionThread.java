@@ -52,7 +52,7 @@ public class PositionThread extends Thread {
                     }
                     else
                     {
-                        myMessage="empty";
+                        myMessage="";
                     }
                     url = new URL(generateRequestUrl());
                     urlConnection = (HttpURLConnection) url.openConnection();
