@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Created by 15936 on 05.06.2016.
@@ -17,8 +18,8 @@ import java.util.ArrayList;
 public class FileUtils {
     private static String filePath = Environment.getExternalStorageDirectory() + "/OffroadMap/";
 
-    public static ArrayList<String> fileInit() {
-        ArrayList<String> listString = new ArrayList();
+    public static LinkedList<String> fileInit() {
+        LinkedList<String> listString = new LinkedList();
         try {
             BufferedReader settingsBr = new BufferedReader(new FileReader(filePath + "Settings.txt"));
             String line = "";

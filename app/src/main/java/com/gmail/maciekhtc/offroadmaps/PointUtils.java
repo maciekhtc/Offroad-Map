@@ -5,15 +5,16 @@ import android.location.Location;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Created by 15936 on 05.06.2016.
  */
 public class PointUtils {
-    public static ArrayList<LatLng> filePoints = new ArrayList();
-    public static ArrayList<LatLng> newPoints = new ArrayList();
+    public static LinkedList<LatLng> filePoints = new LinkedList();
+    public static LinkedList<LatLng> newPoints = new LinkedList();
 
-    public static void pointsFromFile(ArrayList<String> listString)
+    public static void pointsFromFile(LinkedList<String> listString)
     {
         String []LatLngfromLine = new String[2];
         for (String line: listString)
@@ -23,8 +24,8 @@ public class PointUtils {
         }
     }
 
-    public static ArrayList<String> savePoints() {
-        ArrayList<String> listString = new ArrayList();
+    public static LinkedList<String> savePoints() {
+        LinkedList<String> listString = new LinkedList();
         for (LatLng point: newPoints)
         {
             listString.add(point.latitude+":"+point.longitude);
@@ -34,5 +35,12 @@ public class PointUtils {
 
     public static void addNewPoint(Location location) {
         if (location.getAccuracy()<20) newPoints.add(MapUtils.latlngFromLocation(location));
+    }
+
+    private static boolean isDistanceSmall(LatLng loc1, LatLng loc2)
+    {
+        double result=Math.sqrt(Math.pow(loc2.latitude-loc1.latitude,2)+Math.pow(loc2.longitude-loc1.longitude,2));
+        double highestAcceptable = 0.15;
+        return result<highestAcceptable;        //true if smaller than highest acceptable
     }
 }
