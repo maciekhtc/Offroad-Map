@@ -30,6 +30,9 @@ public class PositionThread extends Thread {
             Build.TAGS.length()%10 + Build.TYPE.length()%10 +
             Build.USER.length()%10 ;
     public boolean running = true;
+    
+    private String myMessage = "empty";
+    private int messageRepeat=0;
 
     //
     public void run() {
@@ -37,6 +40,14 @@ public class PositionThread extends Thread {
             if (myLat != 0)
             {
                 try {
+                    if (messageRepeat>0)
+                    {
+                        messageRepeat--;
+                    }
+                    else
+                    {
+                        myMessage="empty";
+                    }
                     url = new URL(generateRequestUrl());
                     urlConnection = (HttpURLConnection) url.openConnection();
                     BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -66,7 +77,7 @@ public class PositionThread extends Thread {
                 "&lat="+myLat+
                 "&lon="+myLon+
                 "&group="+Settings.group+
-                "&msg="+"";
+                "&msg="+myMessage;
                 //add message
     }
     private void updateUsers() {
@@ -82,5 +93,11 @@ public class PositionThread extends Thread {
             }
         }
 
+    }
+
+    public void setMyMessage(String msg)
+    {
+        myMessage = msg;
+        messageRepeat = 5;
     }
 }

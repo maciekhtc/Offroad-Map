@@ -1,9 +1,12 @@
 package com.gmail.maciekhtc.offroadmaps;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
+import android.speech.RecognizerIntent;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +15,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,6 +33,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -120,6 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 //message
                 Log.d("OffroadMap", "Message");
+                promptSpeechInput();
             }
         });
 
@@ -196,7 +202,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     positionThread.myLon = location.getLongitude();
                 }
                 MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
-                if (PointUtils.lines != null && !linesDrawn) drawLines();  //draw lines on map when not drawn and ready (lines not null)
+                if (PointUtils.lines != null && !linesDrawn)
+                    drawLines();  //draw lines on map when not drawn and ready (lines not null)
             }
         });
     }
@@ -206,6 +213,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for (LinkedList<LatLng> line:PointUtils.lines)
         {
             mMap.addPolyline(new PolylineOptions().addAll(line).color(Color.WHITE).width(2.0f));
+        }
+    }
+
+    /**
+     * Showing google speech input dialog
+     * */
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"Say the Message");
+        try {
+            startActivityForResult(intent, 100);    //??
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(),"Speech not supported", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Receiving speech input
+     * */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case 100: {
+                if (resultCode == RESULT_OK && null != data) {
+
+                    ArrayList<String> result = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    positionThread.setMyMessage(result.get(0));
+                    Log.d("OffroadMap",result.get(0));
+                }
+                break;
+            }
+
         }
     }
 }
