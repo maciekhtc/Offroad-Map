@@ -1,5 +1,6 @@
 package com.gmail.maciekhtc.offroadmaps;
 
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,6 +19,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -25,6 +28,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -37,6 +41,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     CheckBox followMyPositionCheckBox;
     CheckBox saveNewPointsCheckBox;
     CheckBox updateOnlineCheckBox;
+    LinkedList<LinkedList<LatLng>> lines = null;
+    boolean linesDrawn = false;
+    Polyline currentLine = null;
+    LinkedList<LatLng> currentLinePoints = null;
 
 
     @Override
@@ -127,6 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         positionThread = new PositionThread();
         positionThread.start();
 
+        lines = PointUtils.getLines();
 
     }
 
@@ -162,9 +171,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         MapUtils.mMap = this.mMap;
-
+        //
         mMap.setMyLocationEnabled(true);
-        //mMap.addPolyline()
+        //
+        currentLine=mMap.addPolyline(new PolylineOptions().color(Color.RED).width(2.5f));
+        currentLinePoints = new LinkedList();
+        //
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 150, null);
@@ -173,13 +185,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onMyLocationChange(Location location) {
                 if (Settings.followMyPosition)
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
-                if (Settings.saveNewPoints) PointUtils.addNewPoint(location);
+                if (location.getAccuracy() < 20) {
+                    if (Settings.saveNewPoints) {
+                        PointUtils.addNewPoint(location);   //add point to newPoints list which will be saved to the file
+                    }
+                    currentLinePoints.add(MapUtils.latlngFromLocation(location)); //add current point to the  list of red line
+                    currentLine.setPoints(currentLinePoints);   //draw red line from points
+                }
+                //Log.d("OffroadMap", "New Location accuracy: "+location.getAccuracy());
                 if (Settings.updateOnline) {
                     positionThread.myLat = location.getLatitude();
                     positionThread.myLon = location.getLongitude();
                 }
                 MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
+                if (lines != null && !linesDrawn) drawLines();  //draw lines on map when not drawn and ready (lines not null)
             }
         });
+    }
+    private void drawLines()
+    {
+        linesDrawn = true;
+        for (LinkedList<LatLng> line:lines)
+        {
+            mMap.addPolyline(new PolylineOptions().addAll(line).color(Color.WHITE).width(2.0f));
+        }
     }
 }

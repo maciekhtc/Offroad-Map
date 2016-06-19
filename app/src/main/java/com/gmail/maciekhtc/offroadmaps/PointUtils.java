@@ -5,7 +5,9 @@ import android.location.Location;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 /**
  * Created by 15936 on 05.06.2016.
@@ -34,13 +36,35 @@ public class PointUtils {
     }
 
     public static void addNewPoint(Location location) {
-        if (location.getAccuracy()<20) newPoints.add(MapUtils.latlngFromLocation(location));
+        newPoints.add(MapUtils.latlngFromLocation(location));
     }
 
     private static boolean isDistanceSmall(LatLng loc1, LatLng loc2)
     {
         double result=Math.sqrt(Math.pow(loc2.latitude-loc1.latitude,2)+Math.pow(loc2.longitude-loc1.longitude,2));
-        double highestAcceptable = 0.15;
+        double highestAcceptable = 0.005;
         return result<highestAcceptable;        //true if smaller than highest acceptable
     }
+    public static LinkedList<LinkedList<LatLng>> getLines()
+    {
+        LinkedList<LinkedList<LatLng>> lines = new LinkedList();
+        Iterator<LatLng> filePointsIterator = filePoints.iterator();
+        while (filePointsIterator.hasNext())
+        {
+            LinkedList<LatLng> newLine = new LinkedList();
+            LatLng loc1 = filePointsIterator.next();
+            while (filePointsIterator.hasNext())
+            {
+                LatLng loc2 = filePointsIterator.next();
+                if (isDistanceSmall(loc1,loc2)) {
+                    newLine.add(loc2);
+                    loc1=loc2;
+                }
+                else break;
+            }
+            lines.add(newLine);
+        }
+        return lines;
+    }
+
 }
