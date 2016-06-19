@@ -54,6 +54,17 @@ public class PointUtils {
             }
             break;
         }
+        if (addFlag)
+        {
+            for (LatLng point : newPoints)
+            {
+                if (isDistanceSmall(point,newPoint,0.005))
+                {
+                    addFlag=false;
+                    break;
+                }
+            }
+        }
         if (addFlag) newPoints.add(newPoint);
 
     }
