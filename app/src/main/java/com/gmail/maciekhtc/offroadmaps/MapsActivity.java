@@ -129,13 +129,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //
 
 
-        loadSettings();
         positionThread = new PositionThread();
         positionThread.start();
 
 
         PointUtils.getLines(PointUtils.pointsFromFile(FileUtils.fileInit()));
-
+        loadSettings();
     }
 
     private void saveSettings() {
