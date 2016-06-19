@@ -41,7 +41,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     CheckBox followMyPositionCheckBox;
     CheckBox saveNewPointsCheckBox;
     CheckBox updateOnlineCheckBox;
-    LinkedList<LinkedList<LatLng>> lines = null;
     boolean linesDrawn = false;
     Polyline currentLine = null;
     LinkedList<LatLng> currentLinePoints = null;
@@ -79,7 +78,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         //
-        PointUtils.pointsFromFile(FileUtils.fileInit());
         //
 
         standardOverlay = (RelativeLayout) findViewById(R.id.standardOverlay);
@@ -135,7 +133,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         positionThread = new PositionThread();
         positionThread.start();
 
-        lines = PointUtils.getLines();
+
+        PointUtils.getLines(PointUtils.pointsFromFile(FileUtils.fileInit()));
 
     }
 
@@ -198,14 +197,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     positionThread.myLon = location.getLongitude();
                 }
                 MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
-                if (lines != null && !linesDrawn) drawLines();  //draw lines on map when not drawn and ready (lines not null)
+                if (PointUtils.lines != null && !linesDrawn) drawLines();  //draw lines on map when not drawn and ready (lines not null)
             }
         });
     }
     private void drawLines()
     {
         linesDrawn = true;
-        for (LinkedList<LatLng> line:lines)
+        for (LinkedList<LatLng> line:PointUtils.lines)
         {
             mMap.addPolyline(new PolylineOptions().addAll(line).color(Color.WHITE).width(2.0f));
         }

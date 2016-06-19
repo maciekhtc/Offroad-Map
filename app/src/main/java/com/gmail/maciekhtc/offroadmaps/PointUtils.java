@@ -13,17 +13,19 @@ import java.util.ListIterator;
  * Created by 15936 on 05.06.2016.
  */
 public class PointUtils {
-    public static LinkedList<LatLng> filePoints = new LinkedList();
+    public static LinkedList<LinkedList<LatLng>> lines = null;
     public static LinkedList<LatLng> newPoints = new LinkedList();
 
-    public static void pointsFromFile(LinkedList<String> listString)
+    public static LinkedList<LatLng> pointsFromFile(LinkedList<String> listString)
     {
+        LinkedList<LatLng> filePoints = new LinkedList();
         String []LatLngfromLine = new String[2];
         for (String line: listString)
         {
             LatLngfromLine = line.split(":",2);
             filePoints.add(new LatLng(Double.parseDouble(LatLngfromLine[0]), Double.parseDouble(LatLngfromLine[1])));
         }
+        return filePoints;
     }
 
     public static LinkedList<String> savePoints() {
@@ -39,15 +41,14 @@ public class PointUtils {
         newPoints.add(MapUtils.latlngFromLocation(location));
     }
 
-    private static boolean isDistanceSmall(LatLng loc1, LatLng loc2)
+    private static boolean isDistanceSmall(LatLng loc1, LatLng loc2, double highestAcceptable)
     {
         double result=Math.sqrt(Math.pow(loc2.latitude-loc1.latitude,2)+Math.pow(loc2.longitude-loc1.longitude,2));
-        double highestAcceptable = 0.005;
         return result<highestAcceptable;        //true if smaller than highest acceptable
     }
-    public static LinkedList<LinkedList<LatLng>> getLines()
+    public static void getLines(LinkedList<LatLng> filePoints)
     {
-        LinkedList<LinkedList<LatLng>> lines = new LinkedList();
+        lines = new LinkedList();
         Iterator<LatLng> filePointsIterator = filePoints.iterator();
         while (filePointsIterator.hasNext())
         {
@@ -56,7 +57,7 @@ public class PointUtils {
             while (filePointsIterator.hasNext())
             {
                 LatLng loc2 = filePointsIterator.next();
-                if (isDistanceSmall(loc1,loc2)) {
+                if (isDistanceSmall(loc1,loc2,0.005)) {
                     newLine.add(loc2);
                     loc1=loc2;
                 }
@@ -64,7 +65,6 @@ public class PointUtils {
             }
             lines.add(newLine);
         }
-        return lines;
     }
 
 }
