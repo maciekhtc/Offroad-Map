@@ -3,6 +3,8 @@ package com.gmail.maciekhtc.offroadmaps;
 import android.os.Build;
 import android.util.Log;
 
+import com.google.android.gms.iid.InstanceID;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -21,19 +23,23 @@ public class PositionThread extends Thread {
     private URL url;
     private HttpURLConnection urlConnection = null;
     private String inLine;
-    private String deviceId = "User" +
-            Build.BOARD.length()%10+ Build.BRAND.length()%10 +
-            Build.CPU_ABI.length()%10 + Build.DEVICE.length()%10 +
-            Build.DISPLAY.length()%10 + Build.HOST.length()%10 +
-            Build.ID.length()%10 + Build.MANUFACTURER.length()%10 +
-            Build.MODEL.length()%10 + Build.PRODUCT.length()%10 +
-            Build.TAGS.length()%10 + Build.TYPE.length()%10 +
-            Build.USER.length()%10 ;
+    private String deviceId;
     public boolean running = true;
-    
+
     private String myMessage = "empty";
     private int messageRepeat=0;
 
+    public void setDeviceId(String id)
+    {
+        deviceId = "User" +
+                Build.BOARD.length()%10+ Build.BRAND.length()%10 +
+                Build.CPU_ABI.length()%10 + Build.DEVICE.length()%10 +
+                Build.DISPLAY.length()%10 + Build.HOST.length()%10 +
+                Build.ID.length()%10 + Build.MANUFACTURER.length()%10 +
+                Build.MODEL.length()%10 + Build.PRODUCT.length()%10 +
+                Build.TAGS.length()%10 + Build.TYPE.length()%10 +
+                Build.USER.length()%10 + id;
+    }
     //
     public void run() {
         while (true) {

@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.iid.InstanceID;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -136,8 +137,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         positionThread = new PositionThread();
+        positionThread.setDeviceId(InstanceID.getInstance(getApplicationContext()).getId());
         positionThread.start();
-
 
         PointUtils.getLines(PointUtils.pointsFromFile(FileUtils.fileInit()));
         loadSettings();
