@@ -26,7 +26,7 @@ public class PositionThread extends Thread {
     private String deviceId;
     public boolean running = true;
 
-    private String myMessage = "empty";
+    private String myMessage = "";
     private int messageRepeat=0;
 
     public void setDeviceId(String id)
@@ -92,10 +92,10 @@ public class PositionThread extends Thread {
             String userParams[] = userLine.split(":");
             if (MapUtils.userList.get(userParams[0]) != null)   //0 - unique id
             {
-                MapUtils.userList.get(userParams[0]).setParams(userParams[1], userParams[2], userParams[3], userParams[4]);
+                MapUtils.userList.get(userParams[0]).setParams(userParams[1], userParams[2], userParams[3], userParams[4], userParams[5]);
             }
             else if (userLine.contains(":")) {
-                MapUtils.userList.put(userParams[0], new User(userParams[1], userParams[2], userParams[3], userParams[4]));
+                MapUtils.userList.put(userParams[0], new User(userParams[1], userParams[2], userParams[3], userParams[4], userParams[5]));
             }
         }
 

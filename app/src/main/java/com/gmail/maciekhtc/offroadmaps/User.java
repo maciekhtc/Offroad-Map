@@ -18,20 +18,28 @@ public class User {
     public double lat;
     public double lon;
     public Marker marker = null;
+    public String message = "";
+    public int messageTimeout=0;
     //
 
-    public User (String lastTime, String username, String lat, String lon) {
+    public User (String lastTime, String username, String lat, String lon, String msg) {
         this.lastTime = Long.parseLong(lastTime);
         this.username = username;
         this.lat = Double.parseDouble(lat);
         this.lon = Double.parseDouble(lon);
+        this.message = msg;
+        if (!msg.contentEquals("")) messageTimeout = 5;
+        MapUtils.usersWithMessage.add(this);
         MapUtils.toUpdate.add(this);
     }
-    public void setParams (String lastTime, String username, String lat, String lon) {
+    public void setParams (String lastTime, String username, String lat, String lon, String msg) {
         this.lastTime = Long.parseLong(lastTime);
         this.username = username;
         this.lat = Double.parseDouble(lat);
         this.lon = Double.parseDouble(lon);
+        this.message = msg;
+        if (!msg.contentEquals("")) messageTimeout = 5;
+        MapUtils.usersWithMessage.add(this);
         MapUtils.toUpdate.add(this);
     }
 

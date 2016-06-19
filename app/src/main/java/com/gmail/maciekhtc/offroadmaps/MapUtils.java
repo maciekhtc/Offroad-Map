@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 public class MapUtils {
     public static HashMap<String,User> userList = new LinkedHashMap<String,User>();
     public static ArrayList<User> toUpdate = new ArrayList<>();
+    public static ArrayList<User> usersWithMessage = new ArrayList<>();
     public static GoogleMap mMap;
 
     public static Location locFromLatLng(LatLng input)
@@ -34,5 +35,33 @@ public class MapUtils {
             u.updateMarker();
         }
         toUpdate.clear();
+    }
+    public static void processMessages()
+    {
+        ArrayList<Integer> toRemove = new ArrayList();
+        for (User u:usersWithMessage)
+        {
+            if (u.messageTimeout==5)
+            {
+                                                //todo speak message now
+                u.marker.setSnippet(u.message);
+                u.marker.showInfoWindow();
+                u.messageTimeout--;
+            }
+            else if (u.messageTimeout == 0)
+            {
+                u.marker.hideInfoWindow();
+                u.marker.setSnippet("");
+                toRemove.add(usersWithMessage.indexOf(u));
+            }
+            else
+            {
+                u.messageTimeout--;
+            }
+        }
+        for (Integer id:toRemove)
+        {
+            usersWithMessage.remove(id);
+        }
     }
 }
