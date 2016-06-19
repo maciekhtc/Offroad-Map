@@ -51,7 +51,7 @@ public class MapUtils {
             else if (u.messageTimeout == 0)
             {
                 u.marker.hideInfoWindow();
-                u.marker.setSnippet("");
+                u.marker.setSnippet(null);
                 toRemove.add(usersWithMessage.indexOf(u));
             }
             else

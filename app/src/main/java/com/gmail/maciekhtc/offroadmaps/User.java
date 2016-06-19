@@ -18,7 +18,7 @@ public class User {
     public double lat;
     public double lon;
     public Marker marker = null;
-    public String message = "";
+    public String message = null;
     public int messageTimeout=0;
     //
 
@@ -27,8 +27,12 @@ public class User {
         this.username = username;
         this.lat = Double.parseDouble(lat);
         this.lon = Double.parseDouble(lon);
-        this.message = msg;
-        if (!msg.contentEquals("")) messageTimeout = 5;
+        if (!msg.contentEquals(""))
+        {
+            messageTimeout = 5;
+            this.message = msg;
+        }
+        else this.message = null;
         MapUtils.usersWithMessage.add(this);
         MapUtils.toUpdate.add(this);
     }
@@ -38,7 +42,12 @@ public class User {
         this.lat = Double.parseDouble(lat);
         this.lon = Double.parseDouble(lon);
         this.message = msg;
-        if (!msg.contentEquals("")) messageTimeout = 5;
+        if (!msg.contentEquals(""))
+        {
+            messageTimeout = 5;
+            this.message = msg;
+        }
+        else this.message = null;
         MapUtils.usersWithMessage.add(this);
         MapUtils.toUpdate.add(this);
     }
