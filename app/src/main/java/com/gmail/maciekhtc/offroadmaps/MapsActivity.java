@@ -50,7 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean linesDrawn = false;
     Polyline currentLine = null;
     LinkedList<LatLng> currentLinePoints = null;
-
+//http://student.pwsz.elblag.pl/~15936/OffroadMap/getUsers.php?deviceId=User32323211dsf&username=inny&lat=54.1752883&lon=19.4068716&group=fornewones&msg=empty
 
     @Override
     public void onBackPressed() {                                                           //zabij proces przy wylaczaniu aplikacji klawiszem back
@@ -202,8 +202,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     positionThread.myLat = location.getLatitude();
                     positionThread.myLon = location.getLongitude();
                     MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
-                    MapUtils.processMessages();
-
                 }
                 if (PointUtils.lines != null && !linesDrawn)
                     drawLines();  //draw lines on map when not drawn and ready (lines not null)

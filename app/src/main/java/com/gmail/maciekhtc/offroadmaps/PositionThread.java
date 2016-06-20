@@ -26,7 +26,7 @@ public class PositionThread extends Thread {
     private String deviceId;
     public boolean running = true;
 
-    private String myMessage = "";
+    private String myMessage = "empty";
     private int messageRepeat = 0;
 
     public void setDeviceId(String id) {
@@ -48,7 +48,7 @@ public class PositionThread extends Thread {
                     if (messageRepeat > 0) {
                         messageRepeat--;
                     } else {
-                        myMessage = "";
+                        myMessage = "empty";
                     }
                     url = new URL(generateRequestUrl());
                     urlConnection = (HttpURLConnection) url.openConnection();

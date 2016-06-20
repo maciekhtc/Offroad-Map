@@ -19,7 +19,6 @@ public class User {
     public double lon;
     public Marker marker = null;
     public String message = null;
-    public int messageTimeout=0;
     //
 
     public User (String lastTime, String username, String lat, String lon, String msg) {
@@ -27,30 +26,25 @@ public class User {
         this.username = username;
         this.lat = Double.parseDouble(lat);
         this.lon = Double.parseDouble(lon);
-        MapUtils.toUpdate.add(this);
-        if (!msg.contentEquals(""))
+        if (!msg.contentEquals("empty"))
         {
-            messageTimeout = 5;
             this.message = msg;
         }
         else this.message = null;
-        if (messageTimeout!=0) MapUtils.usersWithMessage.add(this);
+        MapUtils.toUpdate.add(this);
     }
     public void setParams (String lastTime, String username, String lat, String lon, String msg) {
         this.lastTime = Long.parseLong(lastTime);
         this.username = username;
         this.lat = Double.parseDouble(lat);
         this.lon = Double.parseDouble(lon);
-        MapUtils.toUpdate.add(this);
         this.message = msg;
-        if (!msg.contentEquals(""))
+        if (!msg.contentEquals("empty"))
         {
-            messageTimeout = 5;
             this.message = msg;
         }
         else this.message = null;
-        if (messageTimeout!=0) MapUtils.usersWithMessage.add(this);
-
+        MapUtils.toUpdate.add(this);
     }
 
     public LatLng getLatLng() {
@@ -67,6 +61,16 @@ public class User {
         {
             marker.setPosition(getLatLng());
             marker.setTitle(username);
+        }
+        if (message!=null)
+        {
+            marker.setSnippet(message);
+            marker.showInfoWindow();
+        }
+        else
+        {
+            marker.hideInfoWindow();
+            marker.setSnippet(null);
         }
     }
 }
