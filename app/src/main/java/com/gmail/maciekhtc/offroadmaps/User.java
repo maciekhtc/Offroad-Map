@@ -1,5 +1,6 @@
 package com.gmail.maciekhtc.offroadmaps;
 
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -28,7 +29,7 @@ public class User {
         this.lon = Double.parseDouble(lon);
         if (!msg.contentEquals("empty"))
         {
-            this.message = msg;
+            this.message = Uri.decode(msg);
         }
         else this.message = null;
         MapUtils.toUpdate.add(this);
@@ -38,10 +39,9 @@ public class User {
         this.username = username;
         this.lat = Double.parseDouble(lat);
         this.lon = Double.parseDouble(lon);
-        this.message = msg;
         if (!msg.contentEquals("empty"))
         {
-            this.message = msg;
+            this.message = Uri.decode(msg);
         }
         else this.message = null;
         MapUtils.toUpdate.add(this);

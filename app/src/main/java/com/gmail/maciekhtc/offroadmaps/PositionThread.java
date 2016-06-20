@@ -1,5 +1,6 @@
 package com.gmail.maciekhtc.offroadmaps;
 
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
@@ -9,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -79,7 +81,7 @@ public class PositionThread extends Thread {
                 "&lat=" + myLat +
                 "&lon=" + myLon +
                 "&group=" + Settings.group +
-                "&msg=" + myMessage + ":";
+                "&msg=" + Uri.encode(myMessage) + ":";
         //add message
     }
 
