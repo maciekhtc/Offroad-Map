@@ -201,9 +201,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (Settings.updateOnline) {
                     positionThread.myLat = location.getLatitude();
                     positionThread.myLon = location.getLongitude();
+                    MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
+                    MapUtils.processMessages();
+
                 }
-                MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
-                MapUtils.processMessages();
                 if (PointUtils.lines != null && !linesDrawn)
                     drawLines();  //draw lines on map when not drawn and ready (lines not null)
             }

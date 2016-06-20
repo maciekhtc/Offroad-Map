@@ -61,7 +61,7 @@ public class MapUtils {
         }
         for (Integer id:toRemove)
         {
-            usersWithMessage.remove(id);
+            //usersWithMessage.remove(id);
         }
     }
 }
