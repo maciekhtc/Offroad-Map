@@ -10,4 +10,5 @@ public class Settings {
     public static boolean saveNewPoints = false;
     public static boolean updateOnline = true;
     public static boolean speakMessages = true;
+    public static boolean speakCorners = true;
 }

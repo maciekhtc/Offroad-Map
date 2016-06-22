@@ -205,8 +205,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (Settings.followMyPosition)
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
                 if (location.getAccuracy() < 20) {
-                    if (Settings.saveNewPoints) {
-                        PointUtils.addNewPoint(location);   //add point to newPoints list which will be saved to the file
+                    if (Settings.saveNewPoints || Settings.speakCorners) {
+                        PointUtils.processNewPoint(location);   //add point to newPoints list which will be saved to the file
                     }
                     currentLinePoints.add(MapUtils.latlngFromLocation(location)); //add current point to the  list of red line
                     currentLine.setPoints(currentLinePoints);   //draw red line from points

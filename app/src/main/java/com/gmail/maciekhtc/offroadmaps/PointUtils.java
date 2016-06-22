@@ -37,7 +37,7 @@ public class PointUtils {
         return listString;
     }
 
-    public static void addNewPoint(Location location) {
+    public static void processNewPoint(Location location) {
         LatLng newPoint = MapUtils.latlngFromLocation(location);
         boolean addFlag = true;
         //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
@@ -47,7 +47,8 @@ public class PointUtils {
             {
                 if (isDistanceSmall(existingPoint,newPoint,0.005))
                 {
-                    //todo: update existing point by measuring average from new point which is near and old value of existing point
+                    if (Settings.saveNewPoints) line.set(line.indexOf(existingPoint),new LatLng((existingPoint.latitude + newPoint.latitude) / 2,(existingPoint.longitude + newPoint.longitude) / 2));
+                    //here will be a call to speak corners method, current line and index of point will be passed
                     addFlag=false;
                     break;
                 }
@@ -60,12 +61,14 @@ public class PointUtils {
             {
                 if (isDistanceSmall(point,newPoint,0.005))
                 {
+                    if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(point),new LatLng((point.latitude + newPoint.latitude) / 2,(point.longitude + newPoint.longitude) / 2));
+                    //here will be a call to speak corners method, current line and index of point will be passed
                     addFlag=false;
                     break;
                 }
             }
         }
-        if (addFlag) newPoints.add(newPoint);
+        if (addFlag && Settings.saveNewPoints) newPoints.add(newPoint);
 
     }
 
