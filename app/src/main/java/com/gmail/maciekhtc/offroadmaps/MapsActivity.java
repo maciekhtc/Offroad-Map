@@ -49,6 +49,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     CheckBox followMyPositionCheckBox;
     CheckBox saveNewPointsCheckBox;
     CheckBox updateOnlineCheckBox;
+    CheckBox speakMessagesCheckBox;
+    CheckBox speakCornersCheckBox;
     boolean linesDrawn = false;
     Polyline currentLine = null;
     LinkedList<LatLng> currentLinePoints = null;
@@ -95,6 +97,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         followMyPositionCheckBox = (CheckBox) findViewById(R.id.followMyPositionCheckBox);
         saveNewPointsCheckBox = (CheckBox) findViewById(R.id.saveNewPointsCheckBox);
         updateOnlineCheckBox = (CheckBox) findViewById(R.id.updateOnlineCheckBox);
+        speakMessagesCheckBox = (CheckBox) findViewById(R.id.speakMessagesCheckBox);
+        speakCornersCheckBox = (CheckBox) findViewById(R.id.speakCornersCheckBox);
 
         Button closeSettingsButton = (Button) findViewById(R.id.closeSettingsButton);
         closeSettingsButton.setOnClickListener(new View.OnClickListener() {
@@ -127,7 +131,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 //message
-                Log.d("OffroadMap", "Message");
                 promptSpeechInput();
             }
         });
@@ -135,6 +138,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+
+        positionThread = new PositionThread();
+        positionThread.setDeviceId(InstanceID.getInstance(getApplicationContext()).getId());
+        positionThread.start();
+
+        PointUtils.getLines(PointUtils.pointsFromFile(FileUtils.fileInit()));
+        loadSettings();
         //
         SpeakUtils.tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
@@ -149,13 +160,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
-
-        positionThread = new PositionThread();
-        positionThread.setDeviceId(InstanceID.getInstance(getApplicationContext()).getId());
-        positionThread.start();
-
-        PointUtils.getLines(PointUtils.pointsFromFile(FileUtils.fileInit()));
-        loadSettings();
     }
 
     private void saveSettings() {
@@ -164,7 +168,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Settings.followMyPosition = followMyPositionCheckBox.isChecked();
         Settings.saveNewPoints = saveNewPointsCheckBox.isChecked();
         Settings.updateOnline = updateOnlineCheckBox.isChecked();
-        Log.d("OffroadMap", "Settings saved");
+        Settings.speakMessages = speakMessagesCheckBox.isChecked();
+        Settings.speakCorners = speakCornersCheckBox.isChecked();
+        //Log.d("OffroadMap", "Settings saved");
     }
 
     private void loadSettings() {
@@ -173,7 +179,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         followMyPositionCheckBox.setChecked(Settings.followMyPosition);
         saveNewPointsCheckBox.setChecked(Settings.saveNewPoints);
         updateOnlineCheckBox.setChecked(Settings.updateOnline);
-        Log.d("OffroadMap", "Settings loaded");
+        speakMessagesCheckBox.setChecked(Settings.speakMessages);
+        speakCornersCheckBox.setChecked(Settings.speakCorners);
+        //Log.d("OffroadMap", "Settings loaded");
     }
 
 
