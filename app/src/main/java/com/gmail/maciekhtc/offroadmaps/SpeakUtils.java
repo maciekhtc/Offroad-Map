@@ -30,7 +30,7 @@ public class SpeakUtils {
                     LatLng point2=currentLine.get(indexOfPoint+2);
                     LatLng point3=currentLine.get(indexOfPoint+4);
                     watchOut = false;
-                    //calculateAngle(point1,point2,point3);
+                    calculateAngle(point1,point2,point3);
                 } catch (Exception e)
                 {
                     roadCross();
@@ -44,7 +44,7 @@ public class SpeakUtils {
                     LatLng point2=currentLine.get(indexOfPoint-2);
                     LatLng point3=currentLine.get(indexOfPoint-4);
                     watchOut = false;
-                    //calculateAngle(point1,point2,point3);
+                    calculateAngle(point1,point2,point3);
                 } catch (Exception e)
                 {
                     roadCross();
@@ -65,8 +65,9 @@ public class SpeakUtils {
     }
 
     private static double calculateAngle(LatLng point1, LatLng point2, LatLng point3) {
-
-        return 0;
+        double alpha = Math.atan2(point1.latitude-point2.latitude,point1.longitude-point2.longitude);
+        double beta = Math.atan2(point3.latitude-point2.latitude,point3.longitude-point2.longitude);
+        return (Math.toDegrees(alpha)-Math.toDegrees(beta));
     }
 
     private static void roadCross() {
