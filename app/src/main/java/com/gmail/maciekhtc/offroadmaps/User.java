@@ -1,6 +1,7 @@
 package com.gmail.maciekhtc.offroadmaps;
 
 import android.net.Uri;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -64,6 +65,10 @@ public class User {
         }
         if (message!=null)
         {
+            if (!marker.isInfoWindowShown() && Settings.speakMessages)
+            {
+                SpeakUtils.tts.speak(username+":"+message, TextToSpeech.QUEUE_ADD, null);
+            }
             marker.setSnippet(message);
             marker.showInfoWindow();
         }

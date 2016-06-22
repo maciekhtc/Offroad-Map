@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -135,7 +136,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         //
-
+        SpeakUtils.tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    SpeakUtils.tts.setLanguage(Locale.getDefault());
+                    if (Settings.speakMessages)
+                    {
+                        SpeakUtils.tts.speak("Witaj "+Settings.username,TextToSpeech.QUEUE_ADD,null);
+                        //SpeakUtils.tts.speak("Witaj "+Settings.username,TextToSpeech.QUEUE_ADD,Bundle.EMPTY,"message");
+                    }
+                }
+            }
+        });
 
         positionThread = new PositionThread();
         positionThread.setDeviceId(InstanceID.getInstance(getApplicationContext()).getId());

@@ -9,4 +9,5 @@ public class Settings {
     public static boolean followMyPosition = true;
     public static boolean saveNewPoints = false;
     public static boolean updateOnline = true;
+    public static boolean speakMessages = true;
 }
