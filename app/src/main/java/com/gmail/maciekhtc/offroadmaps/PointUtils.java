@@ -53,7 +53,7 @@ public class PointUtils {
                 if (isDistanceSmall(existingPoint,newPoint,0.005))
                 {
                     if (Settings.saveNewPoints) line.set(line.indexOf(existingPoint),new LatLng((existingPoint.latitude + newPoint.latitude) / 2,(existingPoint.longitude + newPoint.longitude) / 2));
-                    //if (Settings.speakCorners) //here will be a call to speak corners method, current line and index of point will be passed
+                    if (Settings.speakCorners) SpeakUtils.newPosition(line.indexOf(existingPoint),line);
                     addFlag=false;
                     break;
                 }
@@ -67,7 +67,7 @@ public class PointUtils {
                 if (isDistanceSmall(point,newPoint,0.005))
                 {
                     if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(point),new LatLng((point.latitude + newPoint.latitude) / 2,(point.longitude + newPoint.longitude) / 2));
-                    //if (Settings.speakCorners) //here will be a call to speak corners method, current line and index of point will be passed
+                    if (Settings.speakCorners) SpeakUtils.newPosition(newPoints.indexOf(point), newPoints);
                     addFlag=false;
                     break;
                 }
