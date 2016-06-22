@@ -25,7 +25,7 @@ public class User {
 
     public User (String lastTime, String username, String lat, String lon, String msg) {
         this.lastTime = Long.parseLong(lastTime);
-        this.username = username;
+        this.username = Uri.decode(username);
         this.lat = Double.parseDouble(lat);
         this.lon = Double.parseDouble(lon);
         if (!msg.contentEquals("empty"))

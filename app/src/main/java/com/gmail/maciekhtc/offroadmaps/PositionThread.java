@@ -4,14 +4,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
-import com.google.android.gms.iid.InstanceID;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.Map;
 
 /**
  * Created by 15936 on 12.06.2016.
@@ -77,10 +73,10 @@ public class PositionThread extends Thread {
     private String generateRequestUrl() {
         return "http://student.pwsz.elblag.pl/~15936/OffroadMap/getUsers.php" +
                 "?deviceId=" + deviceId +
-                "&username=" + Settings.username +
+                "&username=" + Uri.encode(Settings.username) +
                 "&lat=" + myLat +
                 "&lon=" + myLon +
-                "&group=" + Settings.group +
+                "&group=" + Uri.encode(Settings.group) +
                 "&msg=" + Uri.encode(myMessage) + ":";
         //add message
     }
