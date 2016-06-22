@@ -102,8 +102,9 @@ public class FileUtils {
 
     public static void fileWriteLines() {
         try {
-            FileWriter fileWriter = new FileWriter(filePath + "Map.txt", true);
+            FileWriter fileWriter = new FileWriter(filePath + "Map.txt", false);
             //Log.d("OffroadMap", "File opened for append");
+            fileWriter.write("#Offroad Map points list, you can share this list with others" + "\r\n");
             for (String line : PointUtils.savePoints()) {
                 fileWriter.write(line + "\r\n");
             }

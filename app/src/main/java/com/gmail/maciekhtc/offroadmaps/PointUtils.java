@@ -30,6 +30,11 @@ public class PointUtils {
 
     public static LinkedList<String> savePoints() {
         LinkedList<String> listString = new LinkedList();
+        for (LinkedList<LatLng> line:lines) {
+            for (LatLng existingPoint : line) {
+                listString.add(existingPoint.latitude+":"+existingPoint.longitude);
+            }
+        }
         for (LatLng newPoint: newPoints)
         {
             listString.add(newPoint.latitude+":"+newPoint.longitude);
@@ -48,7 +53,7 @@ public class PointUtils {
                 if (isDistanceSmall(existingPoint,newPoint,0.005))
                 {
                     if (Settings.saveNewPoints) line.set(line.indexOf(existingPoint),new LatLng((existingPoint.latitude + newPoint.latitude) / 2,(existingPoint.longitude + newPoint.longitude) / 2));
-                    //here will be a call to speak corners method, current line and index of point will be passed
+                    //if (Settings.speakCorners) //here will be a call to speak corners method, current line and index of point will be passed
                     addFlag=false;
                     break;
                 }
@@ -62,7 +67,7 @@ public class PointUtils {
                 if (isDistanceSmall(point,newPoint,0.005))
                 {
                     if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(point),new LatLng((point.latitude + newPoint.latitude) / 2,(point.longitude + newPoint.longitude) / 2));
-                    //here will be a call to speak corners method, current line and index of point will be passed
+                    //if (Settings.speakCorners) //here will be a call to speak corners method, current line and index of point will be passed
                     addFlag=false;
                     break;
                 }
