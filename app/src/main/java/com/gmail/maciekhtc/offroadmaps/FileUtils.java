@@ -45,6 +45,10 @@ public class FileUtils {
                     if (line.split(":")[1].contentEquals("true") || line.split(":")[1].contentEquals("1"))
                         Settings.speakMessages = true;
                     else Settings.speakMessages = false;
+                } else if (line.startsWith("speakCorners:")) {
+                    if (line.split(":")[1].contentEquals("true") || line.split(":")[1].contentEquals("1"))
+                        Settings.speakCorners = true;
+                    else Settings.speakCorners = false;
                 }
             }
         } catch (FileNotFoundException e1) {
@@ -126,6 +130,7 @@ public class FileUtils {
             fileWriter.write("saveNewPoints:" + Settings.saveNewPoints + "\r\n");
             fileWriter.write("updateOnline:" + Settings.updateOnline + "\r\n");
             fileWriter.write("speakMessages:" + Settings.speakMessages + "\r\n");
+            fileWriter.write("speakCorners:" + Settings.speakCorners + "\r\n");
             fileWriter.close();
             //Log.d("OffroadMap", "Settings saved");
         } catch (IOException e) {
