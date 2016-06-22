@@ -50,7 +50,7 @@ public class PointUtils {
         {
             for (LatLng existingPoint:line)
             {
-                if (isDistanceSmall(existingPoint,newPoint,0.005))
+                if (isDistanceSmall(existingPoint,newPoint,0.0005))
                 {
                     if (Settings.saveNewPoints) line.set(line.indexOf(existingPoint),new LatLng((existingPoint.latitude + newPoint.latitude) / 2,(existingPoint.longitude + newPoint.longitude) / 2));
                     if (Settings.speakCorners) SpeakUtils.newPosition(line.indexOf(existingPoint),line);
@@ -64,7 +64,7 @@ public class PointUtils {
         {
             for (LatLng point : newPoints)
             {
-                if (isDistanceSmall(point,newPoint,0.005))
+                if (isDistanceSmall(point,newPoint,0.0005))
                 {
                     if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(point),new LatLng((point.latitude + newPoint.latitude) / 2,(point.longitude + newPoint.longitude) / 2));
                     if (Settings.speakCorners) SpeakUtils.newPosition(newPoints.indexOf(point), newPoints);
@@ -93,7 +93,7 @@ public class PointUtils {
             while (filePointsIterator.hasNext())
             {
                 LatLng loc2 = filePointsIterator.next();
-                if (isDistanceSmall(loc1,loc2,0.005)) {
+                if (isDistanceSmall(loc1,loc2,0.0005)) {
                     newLine.add(loc2);
                     loc1=loc2;
                 }

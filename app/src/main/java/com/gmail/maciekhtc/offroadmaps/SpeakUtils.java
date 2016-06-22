@@ -30,7 +30,7 @@ public class SpeakUtils {
                     LatLng point2=currentLine.get(indexOfPoint+2);
                     LatLng point3=currentLine.get(indexOfPoint+4);
                     watchOut = false;
-                    calculateAngle(point1,point2,point3);
+                    corner(calculateAngle(point1, point2, point3));
                 } catch (Exception e)
                 {
                     roadCross();
@@ -44,7 +44,7 @@ public class SpeakUtils {
                     LatLng point2=currentLine.get(indexOfPoint-2);
                     LatLng point3=currentLine.get(indexOfPoint-4);
                     watchOut = false;
-                    calculateAngle(point1,point2,point3);
+                    corner(calculateAngle(point1,point2,point3));
                 } catch (Exception e)
                 {
                     roadCross();
@@ -65,7 +65,7 @@ public class SpeakUtils {
     }
 
     private static double calculateAngle(LatLng point1, LatLng point2, LatLng point3) {
-        double alpha = Math.atan2(point1.latitude-point2.latitude,point1.longitude-point2.longitude);
+        double alpha = Math.atan2(point1.latitude - point2.latitude, point1.longitude - point2.longitude);
         double beta = Math.atan2(point3.latitude-point2.latitude,point3.longitude-point2.longitude);
         return (Math.toDegrees(alpha)-Math.toDegrees(beta));
     }
@@ -76,5 +76,26 @@ public class SpeakUtils {
             watchOut = true;
             tts.speak("Uważaj!", TextToSpeech.QUEUE_ADD, null);
         }
+    }
+    private static void corner(double angle) {
+        double cornerAngle = angle;
+        String message;
+        if (cornerAngle > 0)
+        {
+            message="lewy ";
+        }
+        else
+        {
+            cornerAngle=-cornerAngle;
+            message = "prawy ";
+        }
+        if (cornerAngle < 50) message+="1";
+        else if (cornerAngle < 100) message+="2";
+        else if (cornerAngle < 130) message+="3";
+        else if (cornerAngle < 140) message+="4";
+        else if (cornerAngle < 150) message+="5";
+        else if (cornerAngle < 160) message+="6";
+        else message="";
+        if (!message.contentEquals("")) tts.speak(message, TextToSpeech.QUEUE_ADD, null);
     }
 }
