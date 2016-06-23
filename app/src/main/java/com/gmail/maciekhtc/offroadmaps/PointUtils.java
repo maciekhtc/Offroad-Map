@@ -48,32 +48,32 @@ public class PointUtils {
         LatLng newPoint = MapUtils.latlngFromLocation(location);
         boolean addFlag = true;
         //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
-        for (LinkedList<LatLng> line:lines)
+        for (LatLng point : newPoints)
         {
-            for (LatLng existingPoint:line)
+            if (isDistanceSmall(point,newPoint,2))
             {
-                if (isDistanceSmall(existingPoint,newPoint,5))
-                {
-                    if (Settings.saveNewPoints) line.set(line.indexOf(existingPoint),new LatLng((existingPoint.latitude + newPoint.latitude) / 2,(existingPoint.longitude + newPoint.longitude) / 2));
-                    if (Settings.speakCorners) SpeakUtils.newPosition(line.indexOf(existingPoint),line);
-                    //Log.d("OffroadMap", "Found point "+line.indexOf(existingPoint));
-                    addFlag=false;
-                    break;
-                }
+                if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(point),new LatLng((point.latitude + newPoint.latitude) / 2,(point.longitude + newPoint.longitude) / 2));
+                if (Settings.speakCorners) SpeakUtils.newPosition(newPoints.indexOf(point), newPoints);
+                addFlag=false;
+                break;
             }
-            if (!addFlag) break;
         }
         if (addFlag)
         {
-            for (LatLng point : newPoints)
+            for (LinkedList<LatLng> line:lines)
             {
-                if (isDistanceSmall(point,newPoint,5))
+                for (LatLng existingPoint:line)
                 {
-                    if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(point),new LatLng((point.latitude + newPoint.latitude) / 2,(point.longitude + newPoint.longitude) / 2));
-                    if (Settings.speakCorners) SpeakUtils.newPosition(newPoints.indexOf(point), newPoints);
-                    addFlag=false;
-                    break;
+                    if (isDistanceSmall(existingPoint,newPoint,2))
+                    {
+                        if (Settings.saveNewPoints) line.set(line.indexOf(existingPoint),new LatLng((existingPoint.latitude + newPoint.latitude) / 2,(existingPoint.longitude + newPoint.longitude) / 2));
+                        if (Settings.speakCorners) SpeakUtils.newPosition(line.indexOf(existingPoint),line);
+                        //Log.d("OffroadMap", "Found point "+line.indexOf(existingPoint));
+                        addFlag=false;
+                        break;
+                    }
                 }
+                if (!addFlag) break;
             }
         }
         if (addFlag && Settings.saveNewPoints) newPoints.add(newPoint);
@@ -98,7 +98,7 @@ public class PointUtils {
             while (filePointsIterator.hasNext())
             {
                 LatLng loc2 = filePointsIterator.next();
-                if (isDistanceSmall(loc1,loc2,400)) {
+                if (isDistanceSmall(loc1,loc2,300)) {
                     newLine.add(loc2);
                     loc1=loc2;
                 }
