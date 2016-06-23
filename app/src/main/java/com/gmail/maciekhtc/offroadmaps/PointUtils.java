@@ -98,7 +98,7 @@ public class PointUtils {
             while (filePointsIterator.hasNext())
             {
                 LatLng loc2 = filePointsIterator.next();
-                if (isDistanceSmall(loc1,loc2,100)) {
+                if (isDistanceSmall(loc1,loc2,400)) {
                     newLine.add(loc2);
                     loc1=loc2;
                 }

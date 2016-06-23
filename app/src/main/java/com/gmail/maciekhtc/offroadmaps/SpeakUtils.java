@@ -4,7 +4,6 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.LinkedList;
 
@@ -17,8 +16,7 @@ public class SpeakUtils {
     private static LinkedList<LatLng> currentLineOld = null;
     private static boolean watchOut = false;
     public static TextToSpeech tts;
-
-    //SpeakUtils.tts.speak(username+":"+message, TextToSpeech.QUEUE_ADD, null);
+    private static String cornerMessage="";
 
     public static void newPosition(int indexOfPoint, LinkedList<LatLng> currentLine)
     {
@@ -58,7 +56,6 @@ public class SpeakUtils {
             }
             else
             {   //standing still
-                Log.d("OffroadMap", "Standing still: " + indexOfPoint + "/" + currentLine.size());
                 //MapUtils.mMap.addMarker(new MarkerOptions().position(currentLine.get(indexOfPoint)));
             }
         }
@@ -75,7 +72,11 @@ public class SpeakUtils {
     private static double calculateAngle(LatLng point1, LatLng point2, LatLng point3) {
         double alpha = Math.atan2(point1.latitude - point2.latitude, point1.longitude - point2.longitude);
         double beta = Math.atan2(point3.latitude-point2.latitude,point3.longitude-point2.longitude);
-        return (Math.toDegrees(alpha)-Math.toDegrees(beta));
+        double result = Math.toDegrees(alpha)-Math.toDegrees(beta);
+        if (result > 180) result = -(360 - result);
+        else if (result < -180) result = (result + 360);
+        Log.d("OffroadMap", "Angle: " + result + " / " + point1.toString() + " " + point2.toString() + " " + point3.toString());
+        return (result);
     }
 
     private static void roadCross() {
@@ -87,9 +88,7 @@ public class SpeakUtils {
     }
     private static void corner(double angle) {
         double cornerAngle = angle;
-        Log.d("OffroadMap", "Angle:" + cornerAngle);
-        if (cornerAngle > 180) cornerAngle = 180 - cornerAngle;         //??
-        else if (cornerAngle < -180) cornerAngle = -(cornerAngle + 180);//??
+        //Log.d("OffroadMap", "Angle:" + cornerAngle);
         String message;
         if (cornerAngle > 0)
         {
@@ -107,8 +106,10 @@ public class SpeakUtils {
         else if (cornerAngle < 140) message+="4";
         else if (cornerAngle < 150) message+="5";
         else if (cornerAngle < 160) message+="6";
-        else if (cornerAngle <= 200) message=""; //182.99146692110685 is max ?? 192?? why?
-        else message="błąd, zły kąt";
+        else if (cornerAngle <= 180) message="";    //straight
+        else message="błąd";   //not needed ?
+        if (!cornerMessage.contentEquals("")&&!message.contentEquals("")) message = "do " + message;
         if (!message.contentEquals("")) tts.speak(message, TextToSpeech.QUEUE_ADD, null);
+        cornerMessage = message;
     }
 }
