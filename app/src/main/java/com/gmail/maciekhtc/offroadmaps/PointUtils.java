@@ -1,6 +1,7 @@
 package com.gmail.maciekhtc.offroadmaps;
 
 import android.location.Location;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -43,6 +44,7 @@ public class PointUtils {
     }
 
     public static void processNewPoint(Location location) {
+        //Log.d("OffroadMap", "Process point");
         LatLng newPoint = MapUtils.latlngFromLocation(location);
         boolean addFlag = true;
         //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
@@ -50,21 +52,22 @@ public class PointUtils {
         {
             for (LatLng existingPoint:line)
             {
-                if (isDistanceSmall(existingPoint,newPoint,0.0005))
+                if (isDistanceSmall(existingPoint,newPoint,5))
                 {
                     if (Settings.saveNewPoints) line.set(line.indexOf(existingPoint),new LatLng((existingPoint.latitude + newPoint.latitude) / 2,(existingPoint.longitude + newPoint.longitude) / 2));
                     if (Settings.speakCorners) SpeakUtils.newPosition(line.indexOf(existingPoint),line);
+                    //Log.d("OffroadMap", "Found point "+line.indexOf(existingPoint));
                     addFlag=false;
                     break;
                 }
             }
-            break;
+            if (!addFlag) break;
         }
         if (addFlag)
         {
             for (LatLng point : newPoints)
             {
-                if (isDistanceSmall(point,newPoint,0.0005))
+                if (isDistanceSmall(point,newPoint,5))
                 {
                     if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(point),new LatLng((point.latitude + newPoint.latitude) / 2,(point.longitude + newPoint.longitude) / 2));
                     if (Settings.speakCorners) SpeakUtils.newPosition(newPoints.indexOf(point), newPoints);
@@ -79,8 +82,10 @@ public class PointUtils {
 
     private static boolean isDistanceSmall(LatLng loc1, LatLng loc2, double highestAcceptable)
     {
-        double result=Math.sqrt(Math.pow(loc2.latitude-loc1.latitude,2)+Math.pow(loc2.longitude-loc1.longitude,2));
-        return result<highestAcceptable;        //true if smaller than highest acceptable
+        double result=Math.sqrt((loc2.latitude*10000 - loc1.latitude*10000) * (loc2.latitude*10000 - loc1.latitude*10000))+
+                             ((loc2.longitude*10000 - loc1.longitude*10000) * (loc2.longitude*10000 - loc1.longitude*10000));
+        //Log.d("OffroadMap", "Distance "+result);
+        return (result)<highestAcceptable;        //true if smaller than highest acceptable
     }
     public static void getLines(LinkedList<LatLng> filePoints)
     {
@@ -93,7 +98,7 @@ public class PointUtils {
             while (filePointsIterator.hasNext())
             {
                 LatLng loc2 = filePointsIterator.next();
-                if (isDistanceSmall(loc1,loc2,0.0005)) {
+                if (isDistanceSmall(loc1,loc2,100)) {
                     newLine.add(loc2);
                     loc1=loc2;
                 }
