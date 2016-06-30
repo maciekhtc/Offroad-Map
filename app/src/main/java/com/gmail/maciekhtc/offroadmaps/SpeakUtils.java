@@ -100,12 +100,12 @@ public class SpeakUtils {
             message = "prawy ";
         }
         if (cornerAngle < 5) message = "";  ///////
-        else if (cornerAngle < 50) message+="1";
-        else if (cornerAngle < 100) message+="2";
-        else if (cornerAngle < 130) message+="3";
-        else if (cornerAngle < 140) message+="4";
-        else if (cornerAngle < 150) message+="5";
-        else if (cornerAngle < 160) message+="6";
+        else if (cornerAngle < 70) message+="1";
+        else if (cornerAngle < 110) message+="2";
+        else if (cornerAngle < 135) message+="3";
+        else if (cornerAngle < 150) message+="4";
+        else if (cornerAngle < 160) message+="5";
+        else if (cornerAngle < 170) message+="6";
         else if (cornerAngle <= 180) message="";    //straight
         else message="błąd";   //not needed ?
         if (!cornerMessage.contentEquals("")&&!message.contentEquals("")) message = "do " + message;
