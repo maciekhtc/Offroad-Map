@@ -54,7 +54,7 @@ public class PointUtils {
             if (newPoints.indexOf(point)>(newPointsSize-10)) break; //do not search in 10 latest added points
             if (isDistanceSmall(point,newPoint,2))
             {
-                if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(point),new LatLng((point.latitude + newPoint.latitude) / 2,(point.longitude + newPoint.longitude) / 2));
+                if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(point),modifyPoint(point, newPoint));
                 if (Settings.speakCorners) SpeakUtils.newPosition(newPoints.indexOf(point), newPoints);
                 addFlag=false;
                 break;
@@ -68,7 +68,7 @@ public class PointUtils {
                 {
                     if (isDistanceSmall(existingPoint,newPoint,2))
                     {
-                        if (Settings.saveNewPoints) line.set(line.indexOf(existingPoint),new LatLng((existingPoint.latitude + newPoint.latitude) / 2,(existingPoint.longitude + newPoint.longitude) / 2));
+                        if (Settings.saveNewPoints) line.set(line.indexOf(existingPoint),modifyPoint(existingPoint, newPoint));
                         if (Settings.speakCorners) SpeakUtils.newPosition(line.indexOf(existingPoint),line);
                         //Log.d("OffroadMap", "Found point "+line.indexOf(existingPoint));
                         addFlag=false;
@@ -108,6 +108,13 @@ public class PointUtils {
             }
             lines.add(newLine);
         }
+    }
+    private static LatLng modifyPoint(LatLng existingPoint, LatLng newPoint)
+    {
+        double factor=0.15;
+        double newLatitude = ((existingPoint.latitude * (1 - factor)) + (newPoint.latitude * factor));
+        double newLongitude = ((existingPoint.longitude * (1 - factor)) + (newPoint.longitude * factor));
+        return new LatLng(newLatitude,newLongitude);
     }
 
 }
