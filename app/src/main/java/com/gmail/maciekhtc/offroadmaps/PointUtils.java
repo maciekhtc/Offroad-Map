@@ -48,8 +48,10 @@ public class PointUtils {
         LatLng newPoint = MapUtils.latlngFromLocation(location);
         boolean addFlag = true;
         //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
+        int newPointsSize = newPoints.size();
         for (LatLng point : newPoints)
         {
+            if (newPoints.indexOf(point)>(newPointsSize-10)) break; //do not search in 10 latest added points
             if (isDistanceSmall(point,newPoint,2))
             {
                 if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(point),new LatLng((point.latitude + newPoint.latitude) / 2,(point.longitude + newPoint.longitude) / 2));
