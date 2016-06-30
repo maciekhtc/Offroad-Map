@@ -52,10 +52,20 @@ public class PointUtils {
         for (LatLng point : newPoints)
         {
             if (newPoints.indexOf(point)>(newPointsSize-10)) break; //do not search in 10 latest added points
-            if (isDistanceSmall(point,newPoint,2))
+            if (calculateDistance(point,newPoint)<2)
             {
-                if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(point),modifyPoint(point, newPoint));
-                if (Settings.speakCorners) SpeakUtils.newPosition(newPoints.indexOf(point), newPoints);
+                int startIndex = newPoints.indexOf(point);
+                LatLng bestPoint = point;
+                for (int i=1;i<8;i++)
+                {
+                    if (startIndex+i>=newPoints.size()) break;
+                    if (calculateDistance(bestPoint,newPoint) < calculateDistance(newPoints.get(startIndex+i),newPoint))
+                    {
+                        bestPoint=newPoints.get(startIndex+i);
+                    }
+                }
+                if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(bestPoint),modifyPoint(bestPoint, newPoint));
+                if (Settings.speakCorners) SpeakUtils.newPosition(newPoints.indexOf(bestPoint), newPoints);
                 addFlag=false;
                 break;
             }
@@ -66,11 +76,20 @@ public class PointUtils {
             {
                 for (LatLng existingPoint:line)
                 {
-                    if (isDistanceSmall(existingPoint,newPoint,2))
+                    if (calculateDistance(existingPoint,newPoint)<2)
                     {
-                        if (Settings.saveNewPoints) line.set(line.indexOf(existingPoint),modifyPoint(existingPoint, newPoint));
-                        if (Settings.speakCorners) SpeakUtils.newPosition(line.indexOf(existingPoint),line);
-                        //Log.d("OffroadMap", "Found point "+line.indexOf(existingPoint));
+                        int startIndex = line.indexOf(existingPoint);
+                        LatLng bestPoint = existingPoint;
+                        for (int i=1;i<8;i++)
+                        {
+                            if (startIndex+i>=line.size()) break;
+                            if (calculateDistance(bestPoint, newPoint) < calculateDistance(line.get(startIndex+i),newPoint))
+                            {
+                                bestPoint=line.get(startIndex+i);
+                            }
+                        }
+                        if (Settings.saveNewPoints) line.set(line.indexOf(bestPoint),modifyPoint(bestPoint, newPoint));
+                        if (Settings.speakCorners) SpeakUtils.newPosition(line.indexOf(bestPoint), line);
                         addFlag=false;
                         break;
                     }
@@ -82,12 +101,12 @@ public class PointUtils {
 
     }
 
-    private static boolean isDistanceSmall(LatLng loc1, LatLng loc2, double highestAcceptable)
+    private static double calculateDistance(LatLng loc1, LatLng loc2)
     {
         double result=Math.sqrt((loc2.latitude*10000 - loc1.latitude*10000) * (loc2.latitude*10000 - loc1.latitude*10000))+
                              ((loc2.longitude*10000 - loc1.longitude*10000) * (loc2.longitude*10000 - loc1.longitude*10000));
         //Log.d("OffroadMap", "Distance "+result);
-        return (result)<highestAcceptable;        //true if smaller than highest acceptable
+        return result;
     }
     public static void getLines(LinkedList<LatLng> filePoints)
     {
@@ -100,7 +119,7 @@ public class PointUtils {
             while (filePointsIterator.hasNext())
             {
                 LatLng loc2 = filePointsIterator.next();
-                if (isDistanceSmall(loc1,loc2,300)) {
+                if (calculateDistance(loc1,loc2)<50) {
                     newLine.add(loc2);
                     loc1=loc2;
                 }
