@@ -51,7 +51,6 @@ public class PointUtils {
         int newPointsSize = newPoints.size();
         for (LatLng point : newPoints)
         {
-            if (newPoints.indexOf(point)>(newPointsSize-10)) break; //do not search in 10 latest added points
             if (calculateDistance(point,newPoint)<2)
             {
                 int startIndex = newPoints.indexOf(point);
@@ -65,7 +64,8 @@ public class PointUtils {
                     }
                 }
                 if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(bestPoint),modifyPoint(bestPoint, newPoint));
-                if (Settings.speakCorners) SpeakUtils.newPosition(newPoints.indexOf(bestPoint), newPoints);
+                //do not speak for 10 latest added points
+                if (Settings.speakCorners && (newPoints.indexOf(point)<=(newPointsSize-5))) SpeakUtils.newPosition(newPoints.indexOf(bestPoint), newPoints);
                 addFlag=false;
                 break;
             }
