@@ -51,21 +51,21 @@ public class PointUtils {
         int newPointsSize = newPoints.size();
         for (LatLng point : newPoints)
         {
-            if (calculateDistance(point,newPoint)<2)
+            if (calculateDistance(point,newPoint)<10)
             {
                 int startIndex = newPoints.indexOf(point);
                 LatLng bestPoint = point;
-                for (int i=1;i<8;i++)
+                for (int i=1;i<12;i++)
                 {
                     if (startIndex+i>=newPoints.size()) break;
-                    if (calculateDistance(bestPoint,newPoint) < calculateDistance(newPoints.get(startIndex+i),newPoint))
+                    if (calculateDistance(bestPoint,newPoint) > calculateDistance(newPoints.get(startIndex+i),newPoint))
                     {
                         bestPoint=newPoints.get(startIndex+i);
                     }
                 }
                 if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(bestPoint),modifyPoint(bestPoint, newPoint));
-                //do not speak for 10 latest added points
-                if (Settings.speakCorners && (newPoints.indexOf(point)<=(newPointsSize-5))) SpeakUtils.newPosition(newPoints.indexOf(bestPoint), newPoints);
+                //do not speak for 5 latest added points
+                if (Settings.speakCorners && (newPoints.indexOf(point)<(newPointsSize-5))) SpeakUtils.newPosition(newPoints.indexOf(bestPoint), newPoints);
                 addFlag=false;
                 break;
             }
@@ -76,14 +76,14 @@ public class PointUtils {
             {
                 for (LatLng existingPoint:line)
                 {
-                    if (calculateDistance(existingPoint,newPoint)<2)
+                    if (calculateDistance(existingPoint,newPoint)<10)
                     {
                         int startIndex = line.indexOf(existingPoint);
                         LatLng bestPoint = existingPoint;
-                        for (int i=1;i<8;i++)
+                        for (int i=1;i<12;i++)
                         {
                             if (startIndex+i>=line.size()) break;
-                            if (calculateDistance(bestPoint, newPoint) < calculateDistance(line.get(startIndex+i),newPoint))
+                            if (calculateDistance(bestPoint, newPoint) > calculateDistance(line.get(startIndex+i),newPoint))
                             {
                                 bestPoint=line.get(startIndex+i);
                             }
@@ -119,7 +119,7 @@ public class PointUtils {
             while (filePointsIterator.hasNext())
             {
                 LatLng loc2 = filePointsIterator.next();
-                if (calculateDistance(loc1,loc2)<50) {
+                if (calculateDistance(loc1,loc2)<90) {
                     newLine.add(loc2);
                     loc1=loc2;
                 }
