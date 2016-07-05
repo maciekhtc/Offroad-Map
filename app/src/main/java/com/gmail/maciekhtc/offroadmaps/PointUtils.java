@@ -122,11 +122,12 @@ public class PointUtils {
                 if (calculateDistance(loc1,loc2)<90) {
                     newLine.add(loc2);
                     loc1=loc2;
-                }
+                }//todo search for any other near point, to concatenate lines
                 else break;
             }
             lines.add(newLine);
         }
+        //todo optimize lines by adding nearest point to the end and beginning (if distance lower than 90)
     }
     private static LatLng modifyPoint(LatLng existingPoint, LatLng newPoint)
     {
