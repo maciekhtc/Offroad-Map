@@ -113,21 +113,24 @@ public class PointUtils {
         int count=0;
         lines = new LinkedList();
         Iterator<LatLng> filePointsIterator = filePoints.iterator();
+        LatLng loc1 = filePointsIterator.next();
         while (filePointsIterator.hasNext())
         {
             LinkedList<LatLng> newLine = new LinkedList();
-            LatLng loc1 = filePointsIterator.next();
             newLine.add(loc1);
             count++;
             while (filePointsIterator.hasNext())
             {
                 LatLng loc2 = filePointsIterator.next();
-                count++;
-                if (calculateDistance(loc1,loc2)<50) {
-                    newLine.add(loc2);
+                if (calculateDistance(loc1,loc2)<50) {  //when points are too far break and create new line
                     loc1=loc2;
+                    newLine.add(loc1);
+                    count++;
                 }//todo search for any other near point, to concatenate lines
-                else break;
+                else {
+                    loc1=loc2;
+                    break;
+                }
             }
             lines.add(newLine);
         }
