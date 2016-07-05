@@ -51,7 +51,7 @@ public class PointUtils {
         int newPointsSize = newPoints.size();
         for (LatLng point : newPoints)
         {
-            if (calculateDistance(point,newPoint)<10)
+            if (calculateDistance(point,newPoint)<7)
             {
                 int startIndex = newPoints.indexOf(point);
                 LatLng bestPoint = point;

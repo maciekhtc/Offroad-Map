@@ -159,7 +159,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     SpeakUtils.tts.setLanguage(Locale.getDefault());
                     if (Settings.speakMessages)
                     {
-                        SpeakUtils.tts.speak("Witaj "+Settings.username,TextToSpeech.QUEUE_ADD,null);
+                        //SpeakUtils.tts.speak("Witaj "+Settings.username,TextToSpeech.QUEUE_ADD,null);
                         //SpeakUtils.tts.speak("Witaj "+Settings.username,TextToSpeech.QUEUE_ADD,Bundle.EMPTY,"message");
                     }
                 }
