@@ -1,14 +1,19 @@
 package com.gmail.maciekhtc.offroadmaps;
 
+import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -33,7 +38,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
     private GoogleMap mMap;
     private PositionThread positionThread = null;
@@ -49,16 +54,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean linesDrawn = false;
     Polyline currentLine = null;
     LinkedList<LatLng> currentLinePoints = null;
+    boolean gpsEnabled;
 //http://student.pwsz.elblag.pl/~15936/OffroadMap/getUsers.php?deviceId=User32323211dsf&username=inny&lat=54.1752883&lon=19.4068716&group=fornewones&msg=empty
 
     @Override
     public void onBackPressed() {                                                           //zabij proces przy wylaczaniu aplikacji klawiszem back
-        if (settingsOverlay.isShown())
-        {
+        if (settingsOverlay.isShown()) {
             settingsOverlay.setVisibility(View.GONE);
             standardOverlay.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             positionThread.running = false;
             FileUtils.fileWriteSettings();
             FileUtils.fileWriteLines();
@@ -103,7 +107,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 standardOverlay.setVisibility(View.VISIBLE);
                 View view = getWindow().findViewById(R.id.settingsOverlay);
                 if (view != null) {
-                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
             }
@@ -126,7 +130,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 standardOverlay.setVisibility(View.VISIBLE);
                 View view = getWindow().findViewById(R.id.settingsOverlay);
                 if (view != null) {
-                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
             }
@@ -151,6 +155,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         PointUtils.getLines(PointUtils.pointsFromFile(FileUtils.fileInit()));
         loadSettings();
+        //
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 5, this);
         //
         SpeakUtils.tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
@@ -215,25 +233,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
-                if (Settings.followMyPosition)
-                    mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
-                if (location.getAccuracy() < 20) {
-                    if (Settings.saveNewPoints || Settings.speakCorners) {
-                        PointUtils.processNewPoint(location);   //add point to newPoints list which will be saved to the file
-                    }
-                    currentLinePoints.add(MapUtils.latlngFromLocation(location)); //add current point to the  list of red line
-                    currentLine.setPoints(currentLinePoints);   //draw red line from points
-                }
-                //Log.d("OffroadMap", "New Location accuracy: "+location.getAccuracy());
-                if (Settings.updateOnline) {
-                    positionThread.myLat = location.getLatitude();
-                    positionThread.myLon = location.getLongitude();
-                    MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
-                }
-                if (PointUtils.lines != null && !linesDrawn)
-                    drawLines();  //draw lines on map when not drawn and ready (lines not null)
+                if (!gpsEnabled)locationChange(location);                  //disable location from map if gps provider is able to detect location
             }
         });
+    }
+    private void locationChange(Location location)
+    {
+        if (Settings.followMyPosition)
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
+        if (location.getAccuracy() < 20) {
+            if (Settings.saveNewPoints || Settings.speakCorners) {
+                PointUtils.processNewPoint(location);   //add point to newPoints list which will be saved to the file
+            }
+            currentLinePoints.add(MapUtils.latlngFromLocation(location)); //add current point to the  list of red line
+            currentLine.setPoints(currentLinePoints);   //draw red line from points
+        }
+        //Log.d("OffroadMap", "New Location accuracy: "+location.getAccuracy());
+        if (Settings.updateOnline) {
+            positionThread.myLat = location.getLatitude();
+            positionThread.myLon = location.getLongitude();
+            MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
+        }
+        if (PointUtils.lines != null && !linesDrawn)
+            drawLines();  //draw lines on map when not drawn and ready (lines not null)
     }
     private void drawLines()
     {
@@ -284,5 +306,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         clipboard.setText("");
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (gpsEnabled)locationChange(location);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        if (provider.contentEquals(LocationManager.GPS_PROVIDER)) gpsEnabled = true;
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        if (provider.contentEquals(LocationManager.GPS_PROVIDER)) gpsEnabled = false;
     }
 }
