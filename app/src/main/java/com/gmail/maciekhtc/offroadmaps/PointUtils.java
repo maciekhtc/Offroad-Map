@@ -72,8 +72,9 @@ public class PointUtils {
         }
         if (addFlag)
         {
-            for (LinkedList<LatLng> line:lines)
+            while (lines.descendingIterator().hasNext())
             {
+                LinkedList<LatLng> line = lines.descendingIterator().next();
                 for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
                 {
                     if (calculateDistance(existingPoint,newPoint)<10)
