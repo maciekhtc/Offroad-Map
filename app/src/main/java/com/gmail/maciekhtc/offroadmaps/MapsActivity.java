@@ -235,7 +235,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
-                if (!gpsEnabled)locationChange(location);                  //disable location from map if gps provider is able to detect location
+                if (!gpsEnabled)
+                    locationChange(location);                  //disable location from map if gps provider is able to detect location
             }
         });
     }
@@ -318,7 +319,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onLocationChanged(Location location) {
         gpsEnabled = true;
-        if (gpsEnabled)locationChange(location);
+        if (location != null)locationChange(location);
+        else gpsEnabled = false;
     }
 
     @Override
