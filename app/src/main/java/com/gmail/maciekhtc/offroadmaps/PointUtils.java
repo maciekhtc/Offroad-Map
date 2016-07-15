@@ -31,14 +31,14 @@ public class PointUtils {
 
     public static LinkedList<String> savePoints() {
         LinkedList<String> listString = new LinkedList();
+        for (LatLng newPoint: newPoints)
+        {
+            listString.add(newPoint.latitude+":"+newPoint.longitude);
+        }
         for (LinkedList<LatLng> line:lines) {
             for (LatLng existingPoint : line) {
                 listString.add(existingPoint.latitude+":"+existingPoint.longitude);
             }
-        }
-        for (LatLng newPoint: newPoints)
-        {
-            listString.add(newPoint.latitude+":"+newPoint.longitude);
         }
         return listString;
     }
@@ -72,9 +72,8 @@ public class PointUtils {
         }
         if (addFlag)
         {
-            while (lines.descendingIterator().hasNext())
+            for (LinkedList<LatLng> line:lines)
             {
-                LinkedList<LatLng> line = lines.descendingIterator().next();
                 for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
                 {
                     if (calculateDistance(existingPoint,newPoint)<10)
@@ -104,6 +103,7 @@ public class PointUtils {
 
     private static double calculateDistance(LatLng loc1, LatLng loc2)
     {
+        if (loc1 == null || loc2 == null) return 1000;
         double result=Math.sqrt((loc2.latitude*10000 - loc1.latitude*10000) * (loc2.latitude*10000 - loc1.latitude*10000))+
                              ((loc2.longitude*10000 - loc1.longitude*10000) * (loc2.longitude*10000 - loc1.longitude*10000));
         //Log.d("OffroadMap", "Distance "+result);
@@ -114,7 +114,8 @@ public class PointUtils {
         int count=0;
         lines = new LinkedList();
         Iterator<LatLng> filePointsIterator = filePoints.iterator();
-        LatLng loc1 = filePointsIterator.next();
+        LatLng loc1 = null;
+        if (filePointsIterator.hasNext()) loc1 = filePointsIterator.next();
         while (filePointsIterator.hasNext())
         {
             LinkedList<LatLng> newLine = new LinkedList();
@@ -135,7 +136,7 @@ public class PointUtils {
             }
             lines.add(newLine);
         }
-        //todo optimize lines by adding nearest point to the end and beginning (if distance lower than ##)
+        optimizeLines();
         Log.d("OffroadMap","Lined points: "+count+", in file: "+filePoints.size());
     }
     private static LatLng modifyPoint(LatLng existingPoint, LatLng newPoint)
@@ -144,6 +145,10 @@ public class PointUtils {
         double newLatitude = ((existingPoint.latitude * (1 - factor)) + (newPoint.latitude * factor));
         double newLongitude = ((existingPoint.longitude * (1 - factor)) + (newPoint.longitude * factor));
         return new LatLng(newLatitude,newLongitude);
+    }
+    private static void optimizeLines()
+    {
+        //add
     }
 
 }

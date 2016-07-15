@@ -35,6 +35,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.Locale;
 
@@ -54,7 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean linesDrawn = false;
     Polyline currentLine = null;
     LinkedList<LatLng> currentLinePoints = null;
-    boolean gpsEnabled;
+    boolean gpsEnabled = false;
 //http://student.pwsz.elblag.pl/~15936/OffroadMap/getUsers.php?deviceId=User32323211dsf&username=inny&lat=54.1752883&lon=19.4068716&group=fornewones&msg=empty
 
     @Override
@@ -157,7 +158,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         loadSettings();
         //
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        //gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -166,9 +167,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            Log.d("OffroadMap","No PERMISSIONS");
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 5, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1500, 0, this);
         //
         SpeakUtils.tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
@@ -250,8 +252,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         //Log.d("OffroadMap", "New Location accuracy: "+location.getAccuracy());
         if (Settings.updateOnline) {
-            positionThread.myLat = location.getLatitude();
-            positionThread.myLon = location.getLongitude();
+            try {
+                positionThread.myLat = location.getLatitude();
+                positionThread.myLon = location.getLongitude();
+            } catch (ConcurrentModificationException e)
+            {
+                e.printStackTrace();
+            }
             MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
         }
         if (PointUtils.lines != null && !linesDrawn)
@@ -310,6 +317,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onLocationChanged(Location location) {
+        gpsEnabled = true;
         if (gpsEnabled)locationChange(location);
     }
 
@@ -326,5 +334,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onProviderDisabled(String provider) {
         if (provider.contentEquals(LocationManager.GPS_PROVIDER)) gpsEnabled = false;
+    }
+
+    @Override
+    protected void onStop() {
+        positionThread.running = false;
+        super.onStop();
     }
 }

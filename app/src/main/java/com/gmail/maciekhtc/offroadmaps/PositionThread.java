@@ -57,6 +57,7 @@ public class PositionThread extends Thread {
                     }
                     updateUsers();
                 } catch (Exception e) {
+                    e.printStackTrace();
                 } finally {
                     urlConnection.disconnect();
                 }

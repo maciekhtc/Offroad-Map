@@ -6,6 +6,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -29,10 +30,12 @@ public class MapUtils {
         return new LatLng(input.getLatitude(),input.getLongitude());
     }
     public static void updateOnlineUsers() {
-        for (User u:toUpdate)
-        {
-            u.updateMarker();
-        }
-        toUpdate.clear();
+        try {
+            for (User u : toUpdate) {
+                u.updateMarker();
+            }
+            toUpdate.clear();
+        } catch (ConcurrentModificationException e)
+        {e.printStackTrace();}
     }
 }
