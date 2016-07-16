@@ -337,10 +337,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onProviderDisabled(String provider) {
         if (provider.contentEquals(LocationManager.GPS_PROVIDER)) gpsEnabled = false;
     }
-
-    @Override
-    protected void onStop() {
-        positionThread.running = false;
-        super.onStop();
-    }
 }
