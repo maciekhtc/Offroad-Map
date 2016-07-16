@@ -21,6 +21,7 @@ public class User {
     public double lon;
     public Marker marker = null;
     public String message = null;
+    private boolean say = false;
     //
 
     public User (String lastTime, String username, String lat, String lon, String msg) {
@@ -30,6 +31,7 @@ public class User {
         this.lon = Double.parseDouble(lon);
         if (!msg.contentEquals("empty"))
         {
+            if (message == null) this.say = true;
             this.message = Uri.decode(msg);
         }
         else this.message = null;
@@ -42,6 +44,7 @@ public class User {
         this.lon = Double.parseDouble(lon);
         if (!msg.contentEquals("empty"))
         {
+            if (message == null) this.say = true;
             this.message = Uri.decode(msg);
         }
         else this.message = null;
@@ -65,11 +68,12 @@ public class User {
         }
         if (message!=null)
         {
-            if (!marker.isInfoWindowShown() && Settings.speakMessages)
+            marker.setSnippet(message);
+            if (say && Settings.speakMessages)
             {
                 SpeakUtils.tts.speak(username+":"+message, TextToSpeech.QUEUE_ADD, null);
+                say = false;
             }
-            marker.setSnippet(message);
             marker.showInfoWindow();
         }
         else

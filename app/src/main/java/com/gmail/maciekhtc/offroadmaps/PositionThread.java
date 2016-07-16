@@ -97,6 +97,6 @@ public class PositionThread extends Thread {
 
     public void setMyMessage(String msg) {
         myMessage = msg;
-        messageRepeat = 5;
+        messageRepeat = 3;
     }
 }

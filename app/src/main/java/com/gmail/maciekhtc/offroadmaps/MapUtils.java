@@ -31,11 +31,12 @@ public class MapUtils {
     }
     public static void updateOnlineUsers() {
         try {
-            for (User u : toUpdate) {
-                u.updateMarker();
+            for (int i=toUpdate.size()-1;i>=0;i--) {
+                toUpdate.get(i).updateMarker();
             }
             toUpdate.clear();
-        } catch (ConcurrentModificationException e)
-        {e.printStackTrace();}
+        } catch (ConcurrentModificationException e) {
+            e.printStackTrace();
+        }
     }
 }
