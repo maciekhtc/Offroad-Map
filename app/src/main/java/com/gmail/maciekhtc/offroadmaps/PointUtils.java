@@ -31,14 +31,14 @@ public class PointUtils {
 
     public static ArrayList<String> savePoints() {
         ArrayList<String> listString = new ArrayList();
-        for (LatLng newPoint: newPoints)
-        {
-            listString.add(newPoint.latitude+":"+newPoint.longitude);
-        }
         for (ArrayList<LatLng> line:lines) {
             for (LatLng existingPoint : line) {
                 listString.add(existingPoint.latitude+":"+existingPoint.longitude);
             }
+        }
+        for (LatLng newPoint: newPoints)
+        {
+            listString.add(newPoint.latitude+":"+newPoint.longitude);
         }
         return listString;
     }
@@ -72,8 +72,9 @@ public class PointUtils {
         }
         if (addFlag)
         {
-            for (ArrayList<LatLng> line:lines)
+            for (int lineId = lines.size()-1; lineId>=0 ;lineId--)
             {
+                ArrayList<LatLng> line = lines.get(lineId);
                 for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
                 {
                     if (calculateDistance(existingPoint,newPoint)<10)
