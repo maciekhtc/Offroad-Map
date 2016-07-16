@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Created by 15936 on 12.06.2016.
@@ -90,9 +91,16 @@ public class PositionThread extends Thread {
                 {
                     MapUtils.userList.get(userParams[0]).setParams(userParams[1], userParams[2], userParams[3], userParams[4], userParams[6]);
                 } else {
-                    MapUtils.userList.remove(userParams[0]);
                     MapUtils.userList.put(userParams[0], new User(userParams[1], userParams[2], userParams[3], userParams[4], userParams[6]));
                 }
+            }
+        }
+        for (String id:MapUtils.userList.keySet())
+        {
+            if (!users.contains(id))
+            {
+                MapUtils.userList.get(id).deleteUser();
+                MapUtils.userList.remove(id);
             }
         }
     }

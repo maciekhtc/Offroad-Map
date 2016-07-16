@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -22,6 +23,7 @@ public class User {
     public Marker marker = null;
     public String message = null;
     private boolean say = false;
+    private boolean toDelete = false;
     //
 
     public User (String lastTime, String username, String lat, String lon, String msg) {
@@ -55,23 +57,42 @@ public class User {
         return new LatLng(lat,lon);
     }
     public void updateMarker(){
-        if (marker == null)
+        if (toDelete)
+        {
+            this.marker.setVisible(false);
+            this.marker.remove();
+            this.marker = null;
+            Log.d("OffroadMap", "Removed online user " + username);
+            return;
+        }
+        if (marker != null)
+        {
+            if (message == null) {
+                marker.setVisible(false);
+                marker.remove();
+                marker = MapUtils.mMap.addMarker(new MarkerOptions()
+                        .position(getLatLng())
+                        .title(username));
+            }
+            else
+            {
+                marker.setPosition(getLatLng());
+                marker.setTitle(username);
+            }
+        }
+        else
         {
             marker = MapUtils.mMap.addMarker(new MarkerOptions()
                     .position(getLatLng())
                     .title(username));
         }
-        else
-        {
-            marker.setPosition(getLatLng());
-            marker.setTitle(username);
-        }
+
         if (message!=null)
         {
             marker.setSnippet(message);
             if (say && Settings.speakMessages)
             {
-                SpeakUtils.tts.speak(username+":"+message, TextToSpeech.QUEUE_ADD, null);
+                SpeakUtils.tts.speak(username + ":" + message, TextToSpeech.QUEUE_ADD, null);
                 say = false;
             }
             marker.showInfoWindow();
@@ -81,6 +102,11 @@ public class User {
             marker.hideInfoWindow();
             marker.setSnippet(null);
         }
+    }
+    public void deleteUser()
+    {
+        toDelete = true;
+        MapUtils.toUpdate.add(this);
     }
 }
 
