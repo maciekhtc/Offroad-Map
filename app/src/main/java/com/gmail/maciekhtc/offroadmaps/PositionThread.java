@@ -84,15 +84,16 @@ public class PositionThread extends Thread {
 
     private void updateUsers() {
         for (String userLine : users.split("<br/>")) {
-            String userParams[] = userLine.split(":");
-            if (MapUtils.userList.get(userParams[0]) != null)   //0 - unique id
-            {
-                MapUtils.userList.get(userParams[0]).setParams(userParams[1], userParams[2], userParams[3], userParams[4], userParams[6]);
-            } else if (userLine.contains(":")) {
-                MapUtils.userList.put(userParams[0], new User(userParams[1], userParams[2], userParams[3], userParams[4], userParams[6]));
+            if (userLine.contains(":")) {
+                String userParams[] = userLine.split(":");
+                if (MapUtils.userList.get(userParams[0]) != null)   //0 - unique id
+                {
+                    MapUtils.userList.get(userParams[0]).setParams(userParams[1], userParams[2], userParams[3], userParams[4], userParams[6]);
+                } else {
+                    MapUtils.userList.put(userParams[0], new User(userParams[1], userParams[2], userParams[3], userParams[4], userParams[6]));
+                }
             }
         }
-
     }
 
     public void setMyMessage(String msg) {
