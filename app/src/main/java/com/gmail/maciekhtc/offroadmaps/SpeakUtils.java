@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 /**
  * Created by 15936 on 21.06.2016.
@@ -13,12 +13,12 @@ import java.util.LinkedList;
 public class SpeakUtils {
 
     private static int indexOfPointOld = -1;
-    private static LinkedList<LatLng> currentLineOld = null;
+    private static ArrayList<LatLng> currentLineOld = null;
     private static boolean watchOut = false;
     public static TextToSpeech tts;
     private static String cornerMessage="";
 
-    public static void newPosition(int indexOfPoint, LinkedList<LatLng> currentLine)
+    public static void newPosition(int indexOfPoint, ArrayList<LatLng> currentLine)
     {
         if (currentLine == currentLineOld)
         {

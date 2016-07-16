@@ -54,7 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     CheckBox speakCornersCheckBox;
     boolean linesDrawn = false;
     Polyline currentLine = null;
-    LinkedList<LatLng> currentLinePoints = null;
+    ArrayList<LatLng> currentLinePoints = null;
     boolean gpsEnabled = false;
 //http://student.pwsz.elblag.pl/~15936/OffroadMap/getUsers.php?deviceId=User32323211dsf&username=inny&lat=54.1752883&lon=19.4068716&group=fornewones&msg=empty
 
@@ -227,7 +227,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMyLocationEnabled(true);
         //
         currentLine=mMap.addPolyline(new PolylineOptions().color(Color.RED).width(2.5f));
-        currentLinePoints = new LinkedList();
+        currentLinePoints = new ArrayList();
         //
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setZoomControlsEnabled(true);
@@ -268,7 +268,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void drawLines()
     {
         linesDrawn = true;
-        for (LinkedList<LatLng> line:PointUtils.lines)
+        for (ArrayList<LatLng> line:PointUtils.lines)
         {
             mMap.addPolyline(new PolylineOptions().addAll(line).color(Color.WHITE).width(2.0f));
         }

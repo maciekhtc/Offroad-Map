@@ -14,12 +14,12 @@ import java.util.ListIterator;
  * Created by 15936 on 05.06.2016.
  */
 public class PointUtils {
-    public static LinkedList<LinkedList<LatLng>> lines = null;
-    public static LinkedList<LatLng> newPoints = new LinkedList();
+    public static ArrayList<ArrayList<LatLng>> lines = null;
+    public static ArrayList<LatLng> newPoints = new ArrayList();
 
-    public static LinkedList<LatLng> pointsFromFile(LinkedList<String> listString)
+    public static ArrayList<LatLng> pointsFromFile(ArrayList<String> listString)
     {
-        LinkedList<LatLng> filePoints = new LinkedList();
+        ArrayList<LatLng> filePoints = new ArrayList();
         String []LatLngfromLine = new String[2];
         for (String line: listString)
         {
@@ -29,13 +29,13 @@ public class PointUtils {
         return filePoints;
     }
 
-    public static LinkedList<String> savePoints() {
-        LinkedList<String> listString = new LinkedList();
+    public static ArrayList<String> savePoints() {
+        ArrayList<String> listString = new ArrayList();
         for (LatLng newPoint: newPoints)
         {
             listString.add(newPoint.latitude+":"+newPoint.longitude);
         }
-        for (LinkedList<LatLng> line:lines) {
+        for (ArrayList<LatLng> line:lines) {
             for (LatLng existingPoint : line) {
                 listString.add(existingPoint.latitude+":"+existingPoint.longitude);
             }
@@ -72,7 +72,7 @@ public class PointUtils {
         }
         if (addFlag)
         {
-            for (LinkedList<LatLng> line:lines)
+            for (ArrayList<LatLng> line:lines)
             {
                 for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
                 {
@@ -109,16 +109,16 @@ public class PointUtils {
         //Log.d("OffroadMap", "Distance "+result);
         return result;
     }
-    public static void getLines(LinkedList<LatLng> filePoints)
+    public static void getLines(ArrayList<LatLng> filePoints)
     {
         int count=0;
-        lines = new LinkedList();
+        lines = new ArrayList();
         Iterator<LatLng> filePointsIterator = filePoints.iterator();
         LatLng loc1 = null;
         if (filePointsIterator.hasNext()) loc1 = filePointsIterator.next();
         while (filePointsIterator.hasNext())
         {
-            LinkedList<LatLng> newLine = new LinkedList();
+            ArrayList<LatLng> newLine = new ArrayList();
             newLine.add(loc1);
             count++;
             while (filePointsIterator.hasNext())

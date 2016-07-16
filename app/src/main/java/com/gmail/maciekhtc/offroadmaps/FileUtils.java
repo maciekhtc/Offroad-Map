@@ -18,8 +18,8 @@ import java.util.LinkedList;
 public class FileUtils {
     private static String filePath = Environment.getExternalStorageDirectory() + "/OffroadMap/";
 
-    public static LinkedList<String> fileInit() {
-        LinkedList<String> listString = new LinkedList();
+    public static ArrayList<String> fileInit() {
+        ArrayList<String> listString = new ArrayList();
         try {
             BufferedReader settingsBr = new BufferedReader(new FileReader(filePath + "Settings.txt"));
             String line = "";
