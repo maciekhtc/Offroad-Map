@@ -90,6 +90,7 @@ public class PositionThread extends Thread {
                 {
                     MapUtils.userList.get(userParams[0]).setParams(userParams[1], userParams[2], userParams[3], userParams[4], userParams[6]);
                 } else {
+                    MapUtils.userList.remove(userParams[0]);
                     MapUtils.userList.put(userParams[0], new User(userParams[1], userParams[2], userParams[3], userParams[4], userParams[6]));
                 }
             }
