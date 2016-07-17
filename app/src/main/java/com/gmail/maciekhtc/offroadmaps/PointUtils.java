@@ -16,6 +16,7 @@ import java.util.ListIterator;
 public class PointUtils {
     public static ArrayList<ArrayList<LatLng>> lines = null;
     public static ArrayList<LatLng> newPoints = new ArrayList();
+    public static ArrayList<LatLng> junctionPoints = new ArrayList();
 
     public static ArrayList<LatLng> pointsFromFile(ArrayList<String> listString)
     {
@@ -63,6 +64,7 @@ public class PointUtils {
                     {
                         bestPoint=newPoints.get(startIndex+i);
                     }
+                    //todo if distance becomes really high it means new line was started here so previous point is junction point?
                 }
                 if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(bestPoint),modifyPoint(bestPoint, newPoint));
                 //do not speak for 5 latest added points
@@ -165,7 +167,48 @@ public class PointUtils {
     }
     private static void optimizeLines()
     {
-        //add
+        //add junction points
+        //add to the beginning or ending of line the point which is the clone of nearest point from another line (with checking for short distance)
+        //and then add to the list of junction points to prevent moving those points and to be able to warn user about crossing lines with another route
+        for (ArrayList<LatLng> line : lines)
+        {
+            for (ArrayList<LatLng> comparedLine : lines) {
+                if (line != comparedLine)
+                {
+                    for (LatLng comparedPoint : comparedLine) {
+                        if (calculateDistance(comparedPoint, line.get(0)) < 15) {
+                            int startIndex = line.indexOf(comparedPoint);
+                            LatLng bestPoint = comparedPoint;
+                            for (int i=1;i<12;i++)
+                            {
+                                if (startIndex+i>=comparedLine.size()) break;
+                                if (calculateDistance(bestPoint, line.get(0)) > calculateDistance(comparedLine.get(startIndex+i),line.get(0)))
+                                {
+                                    bestPoint=comparedLine.get(startIndex+i);
+                                }
+                            }
+                            if (calculateDistance(bestPoint, line.get(0)) == 0) line.add(0,bestPoint);
+                            junctionPoints.add(bestPoint);
+                            break;
+                        } else if (calculateDistance(comparedPoint, line.get(line.size() - 1)) < 15) {
+                            int startIndex = line.indexOf(comparedPoint);
+                            LatLng bestPoint = comparedPoint;
+                            for (int i=1;i<12;i++)
+                            {
+                                if (startIndex+i>=comparedLine.size()) break;
+                                if (calculateDistance(bestPoint, line.get(line.size() - 1)) > calculateDistance(comparedLine.get(startIndex+i),line.get(line.size() - 1)))
+                                {
+                                    bestPoint=comparedLine.get(startIndex+i);
+                                }
+                            }
+                            if (calculateDistance(bestPoint, line.get(line.size() - 1)) == 0) line.add(bestPoint);
+                            junctionPoints.add(bestPoint);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }
