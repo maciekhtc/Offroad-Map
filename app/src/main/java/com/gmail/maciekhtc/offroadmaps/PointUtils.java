@@ -1,6 +1,7 @@
 package com.gmail.maciekhtc.offroadmaps;
 
 import android.location.Location;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -114,7 +115,7 @@ public class PointUtils {
 
     }
 
-    private static double calculateDistance(LatLng loc1, LatLng loc2)
+    public static double calculateDistance(LatLng loc1, LatLng loc2)
     {
         if (loc1 == null || loc2 == null) return 1000;
         double result=Math.sqrt((loc2.latitude*10000 - loc1.latitude*10000) * (loc2.latitude*10000 - loc1.latitude*10000))+

@@ -20,6 +20,17 @@ public class SpeakUtils {
 
     public static void newPosition(int indexOfPoint, ArrayList<LatLng> currentLine)
     {
+        if (Settings.speakCorners) {
+            for (LatLng junction : PointUtils.junctionPoints)
+            {
+                if (PointUtils.calculateDistance(currentLine.get(indexOfPoint),junction)<10)
+                {
+                    roadCross();
+                    break;
+                }
+            }
+        }
+        //
         if (currentLine == currentLineOld)
         {
             if (indexOfPoint > indexOfPointOld)
