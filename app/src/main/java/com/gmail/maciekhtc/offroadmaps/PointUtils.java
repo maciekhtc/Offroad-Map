@@ -137,12 +137,12 @@ public class PointUtils {
                 else {
                     for (ArrayList<LatLng> existingLine : lines)
                     {
-                        if (calculateDistance(loc1,existingLine.get(0))<50) {   //paste this at the beginning
+                        if (calculateDistance(loc1,existingLine.get(0))<15) {   //paste this at the beginning
                             existingLine.addAll(0,newLine);
                             addNewLine = false;
                             break;
                         }
-                        else if (calculateDistance(loc1,existingLine.get(existingLine.size()-1))<50)    //paste this at the end
+                        else if (calculateDistance(loc1,existingLine.get(existingLine.size()-1))<15)    //paste this at the end
                         {
                             existingLine.addAll(newLine);
                             addNewLine = false;
@@ -156,7 +156,7 @@ public class PointUtils {
             if (addNewLine) lines.add(newLine);
         }
         optimizeLines();
-        Log.d("OffroadMap","Lined points: "+count+", in file: "+filePoints.size());
+        //Log.d("OffroadMap","Lined points: "+count+", in file: "+filePoints.size());
     }
     private static LatLng modifyPoint(LatLng existingPoint, LatLng newPoint)
     {
@@ -187,8 +187,9 @@ public class PointUtils {
                                     bestPoint=comparedLine.get(startIndex+i);
                                 }
                             }
-                            if (calculateDistance(bestPoint, line.get(0)) == 0) line.add(0,bestPoint);
+                            if (calculateDistance(bestPoint, line.get(0)) != 0) line.add(0,bestPoint);
                             junctionPoints.add(bestPoint);
+                            Log.d("OffroadMap", "Junction");
                             break;
                         } else if (calculateDistance(comparedPoint, line.get(line.size() - 1)) < 15) {
                             int startIndex = line.indexOf(comparedPoint);
@@ -201,8 +202,9 @@ public class PointUtils {
                                     bestPoint=comparedLine.get(startIndex+i);
                                 }
                             }
-                            if (calculateDistance(bestPoint, line.get(line.size() - 1)) == 0) line.add(bestPoint);
+                            if (calculateDistance(bestPoint, line.get(line.size() - 1)) != 0) line.add(bestPoint);
                             junctionPoints.add(bestPoint);
+                            Log.d("OffroadMap", "Junction");
                             break;
                         }
                     }
