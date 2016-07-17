@@ -52,7 +52,7 @@ public class PointUtils {
         for (int index = newPoints.size()-2; index>=0; index--) //check all without last added point, in reverse to find last matching point faster when standing still
         {                                           //without last added because it will help making points closer to each other still with no error
             LatLng point = newPoints.get(index);
-            if (calculateDistance(point,newPoint)<7)
+            if (calculateDistance(point,newPoint)<6)
             {
                 int startIndex = newPoints.indexOf(point);
                 LatLng bestPoint = point;
@@ -78,7 +78,7 @@ public class PointUtils {
                 ArrayList<LatLng> line = lines.get(lineId);
                 for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
                 {
-                    if (calculateDistance(existingPoint,newPoint)<10)
+                    if (calculateDistance(existingPoint,newPoint)<8)
                     {
                         int startIndex = line.indexOf(existingPoint);
                         LatLng bestPoint = existingPoint;
@@ -143,7 +143,7 @@ public class PointUtils {
     }
     private static LatLng modifyPoint(LatLng existingPoint, LatLng newPoint)
     {
-        double factor=0.15;
+        double factor=0.05;
         double newLatitude = ((existingPoint.latitude * (1 - factor)) + (newPoint.latitude * factor));
         double newLongitude = ((existingPoint.longitude * (1 - factor)) + (newPoint.longitude * factor));
         return new LatLng(newLatitude,newLongitude);
