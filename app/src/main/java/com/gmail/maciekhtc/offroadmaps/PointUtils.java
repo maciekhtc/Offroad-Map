@@ -123,20 +123,35 @@ public class PointUtils {
             ArrayList<LatLng> newLine = new ArrayList();
             newLine.add(loc1);
             count++;
+            boolean addNewLine = true;
             while (filePointsIterator.hasNext())
             {
                 LatLng loc2 = filePointsIterator.next();
-                if (calculateDistance(loc1,loc2)<50) {  //when points are too far break and create new line
+                if (calculateDistance(loc1,loc2)<15) {  //when points are too far break and create new line
                     loc1=loc2;
                     newLine.add(loc1);
                     count++;
-                }//todo search for any other near point, to concatenate lines
+                }
                 else {
+                    for (ArrayList<LatLng> existingLine : lines)
+                    {
+                        if (calculateDistance(loc1,existingLine.get(0))<15) {   //paste this at the beginning
+                            existingLine.addAll(0,newLine);
+                            addNewLine = false;
+                            break;
+                        }
+                        else if (calculateDistance(loc1,existingLine.get(existingLine.size()-1))<15)    //paste this at the end
+                        {
+                            existingLine.addAll(newLine);
+                            addNewLine = false;
+                            break;
+                        }
+                    }
                     loc1=loc2;
                     break;
                 }
             }
-            lines.add(newLine);
+            if (addNewLine) lines.add(newLine);
         }
         optimizeLines();
         Log.d("OffroadMap","Lined points: "+count+", in file: "+filePoints.size());
