@@ -49,8 +49,9 @@ public class PointUtils {
         boolean addFlag = true;
         //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
         int newPointsSize = newPoints.size();
-        for (LatLng point : newPoints)
-        {
+        for (int index = newPoints.size()-2; index>=0; index--) //check all without last added point, in reverse to find last matching point faster when standing still
+        {                                           //without last added because it will help making points closer to each other still with no error
+            LatLng point = newPoints.get(index);
             if (calculateDistance(point,newPoint)<7)
             {
                 int startIndex = newPoints.indexOf(point);
