@@ -129,7 +129,7 @@ public class PointUtils {
             while (filePointsIterator.hasNext())
             {
                 LatLng loc2 = filePointsIterator.next();
-                if (calculateDistance(loc1,loc2)<15) {  //when points are too far break and create new line
+                if (calculateDistance(loc1,loc2)<25) {  //when points are too far break and create new line
                     loc1=loc2;
                     newLine.add(loc1);
                     count++;
@@ -137,12 +137,12 @@ public class PointUtils {
                 else {
                     for (ArrayList<LatLng> existingLine : lines)
                     {
-                        if (calculateDistance(loc1,existingLine.get(0))<15) {   //paste this at the beginning
+                        if (calculateDistance(loc1,existingLine.get(0))<25) {   //paste this at the beginning
                             existingLine.addAll(0,newLine);
                             addNewLine = false;
                             break;
                         }
-                        else if (calculateDistance(loc1,existingLine.get(existingLine.size()-1))<15)    //paste this at the end
+                        else if (calculateDistance(loc1,existingLine.get(existingLine.size()-1))<25)    //paste this at the end
                         {
                             existingLine.addAll(newLine);
                             addNewLine = false;
