@@ -185,7 +185,7 @@ public class PointUtils {
             for (ArrayList<LatLng> comparedLine : lines) {
                 for (int indexOfComparedPoint = 0;indexOfComparedPoint<comparedLine.size();indexOfComparedPoint++) {
                     LatLng comparedPoint = comparedLine.get(indexOfComparedPoint);
-                    if (!(line == comparedLine && indexOfComparedPoint > comparedLine.size()-20)) {
+                    if (!(line == comparedLine && indexOfComparedPoint > comparedLine.size()-10)) {
                         if (calculateDistance(comparedPoint, line.get(0)) < 15) {
                             int startIndex = line.indexOf(comparedPoint);
                             LatLng bestPoint = comparedPoint;
