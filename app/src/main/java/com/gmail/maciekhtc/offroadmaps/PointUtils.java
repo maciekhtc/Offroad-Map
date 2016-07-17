@@ -92,6 +92,7 @@ public class PointUtils {
                                 bestPoint=line.get(startIndex+i);
                             }
                         }
+                        //todo check if best point isn't a junction point then don't modify
                         if (Settings.saveNewPoints) line.set(line.indexOf(bestPoint),modifyPoint(bestPoint, newPoint));
                         if (Settings.speakCorners) SpeakUtils.newPosition(line.indexOf(bestPoint), line);
                         addFlag=false;
@@ -137,12 +138,12 @@ public class PointUtils {
                 else {
                     for (ArrayList<LatLng> existingLine : lines)
                     {
-                        if (calculateDistance(loc1,existingLine.get(0))<15) {   //paste this at the beginning
+                        if (calculateDistance(loc1,existingLine.get(0))<25) {   //paste this at the beginning
                             existingLine.addAll(0,newLine);
                             addNewLine = false;
                             break;
                         }
-                        else if (calculateDistance(loc1,existingLine.get(existingLine.size()-1))<15)    //paste this at the end
+                        else if (calculateDistance(loc1,existingLine.get(existingLine.size()-1))<25)    //paste this at the end
                         {
                             existingLine.addAll(newLine);
                             addNewLine = false;
@@ -176,7 +177,7 @@ public class PointUtils {
                 if (line != comparedLine)
                 {
                     for (LatLng comparedPoint : comparedLine) {
-                        if (calculateDistance(comparedPoint, line.get(0)) < 15) {
+                        if (calculateDistance(comparedPoint, line.get(0)) < 25) {
                             int startIndex = line.indexOf(comparedPoint);
                             LatLng bestPoint = comparedPoint;
                             for (int i=1;i<12;i++)
@@ -191,7 +192,7 @@ public class PointUtils {
                             junctionPoints.add(bestPoint);
                             Log.d("OffroadMap", "Junction");
                             break;
-                        } else if (calculateDistance(comparedPoint, line.get(line.size() - 1)) < 15) {
+                        } else if (calculateDistance(comparedPoint, line.get(line.size() - 1)) < 25) {
                             int startIndex = line.indexOf(comparedPoint);
                             LatLng bestPoint = comparedPoint;
                             for (int i=1;i<12;i++)
