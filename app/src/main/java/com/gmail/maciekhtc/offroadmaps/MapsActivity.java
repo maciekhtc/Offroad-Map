@@ -170,7 +170,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d("OffroadMap","No PERMISSIONS");
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1500, 0, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1500, 1, this);
         //
         SpeakUtils.tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
@@ -235,15 +235,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
+                if (Settings.followMyPosition)
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
                 if (!gpsEnabled)
                     locationChange(location);                  //disable location from map if gps provider is able to detect location
+                MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
             }
         });
     }
     private void locationChange(Location location)
     {
-        if (Settings.followMyPosition)
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
         if (location.getAccuracy() < 20) {
             if (Settings.saveNewPoints || Settings.speakCorners) {
                 PointUtils.processNewPoint(location);   //add point to newPoints list which will be saved to the file
@@ -251,16 +252,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             currentLinePoints.add(MapUtils.latlngFromLocation(location)); //add current point to the  list of red line
             currentLine.setPoints(currentLinePoints);   //draw red line from points
         }
-        //Log.d("OffroadMap", "New Location accuracy: "+location.getAccuracy());
         if (Settings.updateOnline) {
             try {
                 positionThread.myLat = location.getLatitude();
                 positionThread.myLon = location.getLongitude();
-            } catch (ConcurrentModificationException e)
-            {
-                e.printStackTrace();
-            }
-            MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
+            } catch (ConcurrentModificationException e) {e.printStackTrace();}
         }
         if (PointUtils.lines != null && !linesDrawn)
             drawLines();  //draw lines on map when not drawn and ready (lines not null)
@@ -284,7 +280,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE,Locale.getDefault());//new Locale("Polish","Poland"));// //todo
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"Say the Message");
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say the Message");
         try {
             startActivityForResult(intent, 100);    //??
         } catch (ActivityNotFoundException a) {
@@ -319,7 +315,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onLocationChanged(Location location) {
         gpsEnabled = true;
-        if (location != null)locationChange(location);
+        if (location != null) locationChange(location);
         else gpsEnabled = false;
     }
 

@@ -54,7 +54,7 @@ public class PointUtils {
         for (int index = newPointsSize-2; index>=0; index--) //check all without last added point, in reverse to find last matching point faster when standing still
         {                                           //without last added because it will help making points closer to each other still with no error
             LatLng point = newPoints.get(index);
-            if (calculateDistance(point,newPoint)<6)
+            if (calculateDistance(point,newPoint)<10)
             {
                 int startIndex = newPoints.indexOf(point);
                 LatLng bestPoint = point;
@@ -81,7 +81,7 @@ public class PointUtils {
                 ArrayList<LatLng> line = lines.get(lineId);
                 for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
                 {
-                    if (calculateDistance(existingPoint,newPoint)<8)
+                    if (calculateDistance(existingPoint,newPoint)<15)
                     {
                         int startIndex = line.indexOf(existingPoint);
                         LatLng bestPoint = existingPoint;
@@ -118,9 +118,8 @@ public class PointUtils {
     public static double calculateDistance(LatLng loc1, LatLng loc2)
     {
         if (loc1 == null || loc2 == null) return 1000;
-        double result=Math.sqrt((loc2.latitude*10000 - loc1.latitude*10000) * (loc2.latitude*10000 - loc1.latitude*10000))+
-                             ((loc2.longitude*10000 - loc1.longitude*10000) * (loc2.longitude*10000 - loc1.longitude*10000));
-        //Log.d("OffroadMap", "Distance "+result);
+        double result=Math.sqrt((loc2.latitude*20000 - loc1.latitude*20000) * (loc2.latitude*20000 - loc1.latitude*20000))+
+                ((loc2.longitude*10000 - loc1.longitude*10000) * (loc2.longitude*10000 - loc1.longitude*10000));
         return result;
     }
     public static void getLines(ArrayList<LatLng> filePoints)
@@ -145,7 +144,8 @@ public class PointUtils {
                     count++;
                 }
                 else {
-                    for (ArrayList<LatLng> existingLine : lines)
+                    //loc1 is last point from newLine, loc2 is the next point which will be first point in next line
+                    /*for (ArrayList<LatLng> existingLine : lines)
                     {
                         if (calculateDistance(loc1,existingLine.get(0))<15) {   //paste this at the beginning
                             existingLine.addAll(0,newLine);
@@ -158,7 +158,7 @@ public class PointUtils {
                             addNewLine = false;
                             break;
                         }
-                    }
+                    }*/ //poprawic bo moze trzeba odwrocic kolejnosc?
                     loc1=loc2;
                     break;
                 }
@@ -185,9 +185,9 @@ public class PointUtils {
             for (ArrayList<LatLng> comparedLine : lines) {
                 for (int indexOfComparedPoint = 0;indexOfComparedPoint<comparedLine.size();indexOfComparedPoint++) {
                     LatLng comparedPoint = comparedLine.get(indexOfComparedPoint);
-                    if (!(line == comparedLine && indexOfComparedPoint > comparedLine.size()-10)) {
-                        if (calculateDistance(comparedPoint, line.get(0)) < 15) {
-                            int startIndex = line.indexOf(comparedPoint);
+                    if (!(line == comparedLine && (indexOfComparedPoint > comparedLine.size()-8 || indexOfComparedPoint < 8))) {
+                        if (calculateDistance(comparedPoint, line.get(0)) < 25) {
+                            int startIndex = comparedLine.indexOf(comparedPoint);
                             LatLng bestPoint = comparedPoint;
                             for (int i = 1; i < 12; i++) {
                                 if (startIndex + i >= comparedLine.size()) break;
@@ -195,13 +195,15 @@ public class PointUtils {
                                     bestPoint = comparedLine.get(startIndex + i);
                                 }
                             }
-                            if (calculateDistance(bestPoint, line.get(0)) != 0)
+                            if (calculateDistance(bestPoint, line.get(0)) != 0) {
                                 line.add(0, bestPoint);
+                                Log.d("OffroadMap", "Add Junction " + bestPoint.toString());
+                            }
                             junctionPoints.add(bestPoint);
-                            Log.d("OffroadMap", "Junction");
+                            Log.d("OffroadMap", "Found junction " + bestPoint.toString());
                             break;
-                        } else if (calculateDistance(comparedPoint, line.get(line.size() - 1)) < 15) {
-                            int startIndex = line.indexOf(comparedPoint);
+                        } else if (calculateDistance(comparedPoint, line.get(line.size() - 1)) < 25) {
+                            int startIndex = comparedLine.indexOf(comparedPoint);
                             LatLng bestPoint = comparedPoint;
                             for (int i = 1; i < 12; i++) {
                                 if (startIndex + i >= comparedLine.size()) break;
@@ -209,10 +211,12 @@ public class PointUtils {
                                     bestPoint = comparedLine.get(startIndex + i);
                                 }
                             }
-                            if (calculateDistance(bestPoint, line.get(line.size() - 1)) != 0)
+                            if (calculateDistance(bestPoint, line.get(line.size() - 1)) != 0) {
                                 line.add(bestPoint);
+                                Log.d("OffroadMap", "Add Junction " + bestPoint.toString());
+                            }
                             junctionPoints.add(bestPoint);
-                            Log.d("OffroadMap", "Junction");
+                            Log.d("OffroadMap", "Found Junction " + bestPoint.toString());
                             break;
                         }
                     }

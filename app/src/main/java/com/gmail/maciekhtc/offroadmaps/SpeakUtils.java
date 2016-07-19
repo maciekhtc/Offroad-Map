@@ -20,7 +20,7 @@ public class SpeakUtils {
 
     public static void newPosition(int indexOfPoint, ArrayList<LatLng> currentLine)
     {
-        if (Settings.speakCorners) {
+        if (indexOfPoint!=-1 && indexOfPoint<currentLine.size()) {
             for (LatLng junction : PointUtils.junctionPoints)
             {
                 if (PointUtils.calculateDistance(currentLine.get(indexOfPoint),junction)<10)
