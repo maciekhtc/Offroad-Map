@@ -157,13 +157,13 @@ public class PointUtils {
                     ArrayList<LatLng> lineToConcatenateSecondTime = null;
                     for (ArrayList<LatLng> existingLine : lines)
                     {
-                        if (calculateDistance(loc1,existingLine.get(0))<15) {   //paste this at the beginning               //OK
+                        if (calculateDistance(loc1,existingLine.get(0))<25) {   //paste this at the beginning               //OK
                             existingLine.addAll(0,newLine);
                             addNewLine = false;
                             lineToConcatenateSecondTime = existingLine;
                             break;
                         }
-                        else if (calculateDistance(loc1,existingLine.get(existingLine.size()-1))<15)    //paste this at the end     //REVERSED!
+                        else if (calculateDistance(loc1,existingLine.get(existingLine.size()-1))<25)    //paste this at the end     //REVERSED!
                         {
                             //existingLine.addAll(newLine);
                             for (int indexForReverse=newLine.size()-1;indexForReverse>=0;indexForReverse--)
@@ -175,7 +175,7 @@ public class PointUtils {
                             break;
                         }
 
-                        else if (calculateDistance(newLine.get(0),existingLine.get(0))<15)    //at the beginning            //REVERSED one by one
+                        else if (calculateDistance(newLine.get(0),existingLine.get(0))<25)    //at the beginning            //REVERSED one by one
                         {
                             //existingLine.addAll(0,newLine);
                             for (int indexForReverse=0;indexForReverse<newLine.size();indexForReverse++)
@@ -186,7 +186,7 @@ public class PointUtils {
                             lineToConcatenateSecondTime = existingLine;
                             break;
                         }
-                        else if (calculateDistance(newLine.get(0),existingLine.get(existingLine.size()-1))<15)  //at the end    //OK
+                        else if (calculateDistance(newLine.get(0),existingLine.get(existingLine.size()-1))<25)  //at the end    //OK
                         {
                             existingLine.addAll(newLine);
                             addNewLine = false;
@@ -196,7 +196,8 @@ public class PointUtils {
                     }
                     if (lineToConcatenateSecondTime!=null) {
                         for (ArrayList<LatLng> existingLine : lines) {
-                            if (calculateDistance(lineToConcatenateSecondTime.get(lineToConcatenateSecondTime.size() - 1), existingLine.get(0)) < 15) {
+                            if (existingLine==lineToConcatenateSecondTime) continue;
+                            if (calculateDistance(lineToConcatenateSecondTime.get(lineToConcatenateSecondTime.size() - 1), existingLine.get(0)) < 25) {
                                 existingLine.addAll(0, lineToConcatenateSecondTime);
                                 addNewLine = false;
                                 break;
@@ -208,7 +209,7 @@ public class PointUtils {
                                 }
                                 addNewLine = false;
                                 break;
-                            } else if (calculateDistance(lineToConcatenateSecondTime.get(0), existingLine.get(0)) < 15)    //at the beginning            //REVERSED one by one
+                            } else if (calculateDistance(lineToConcatenateSecondTime.get(0), existingLine.get(0)) < 25)    //at the beginning            //REVERSED one by one
                             {
                                 //existingLine.addAll(0,newLine);
                                 for (int indexForReverse = 0; indexForReverse < lineToConcatenateSecondTime.size(); indexForReverse++) {
@@ -216,7 +217,7 @@ public class PointUtils {
                                 }
                                 addNewLine = false;
                                 break;
-                            } else if (calculateDistance(lineToConcatenateSecondTime.get(0), existingLine.get(existingLine.size() - 1)) < 15)  //at the end    //OK
+                            } else if (calculateDistance(lineToConcatenateSecondTime.get(0), existingLine.get(existingLine.size() - 1)) < 25)  //at the end    //OK
                             {
                                 existingLine.addAll(lineToConcatenateSecondTime);
                                 addNewLine = false;
