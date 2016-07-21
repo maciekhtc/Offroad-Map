@@ -170,7 +170,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d("OffroadMap","No PERMISSIONS");
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1500, 1, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1500, 6, this);
         //
         SpeakUtils.tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override

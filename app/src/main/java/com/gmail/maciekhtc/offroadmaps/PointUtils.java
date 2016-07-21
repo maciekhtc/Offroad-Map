@@ -56,6 +56,15 @@ public class PointUtils {
             LatLng point = newPoints.get(index);
             if (calculateDistance(point,newPoint)<10)
             {
+                //prevent recording points when started going back
+                if ((calculateDistance(newPoint,newPoints.get(newPointsSize-2)) <
+                        calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2))) &&
+                        calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2)) < 10)
+                {
+                    addFlag = false;
+                    break;
+                }
+                //
                 int startIndex = newPoints.indexOf(point);
                 LatLng bestPoint = point;
                 for (int i=1;i<12;i++)
@@ -145,20 +154,42 @@ public class PointUtils {
                 }
                 else {
                     //loc1 is last point from newLine, loc2 is the next point which will be first point in next line
-                    /*for (ArrayList<LatLng> existingLine : lines)
+                    for (ArrayList<LatLng> existingLine : lines)
                     {
-                        if (calculateDistance(loc1,existingLine.get(0))<15) {   //paste this at the beginning
+                        if (calculateDistance(loc1,existingLine.get(0))<15) {   //paste this at the beginning               //OK
                             existingLine.addAll(0,newLine);
                             addNewLine = false;
                             break;
                         }
-                        else if (calculateDistance(loc1,existingLine.get(existingLine.size()-1))<15)    //paste this at the end
+                        else if (calculateDistance(loc1,existingLine.get(existingLine.size()-1))<15)    //paste this at the end     //REVERSED!
+                        {
+                            //existingLine.addAll(newLine);
+                            for (int indexForReverse=newLine.size()-1;indexForReverse>=0;indexForReverse--)
+                            {
+                                existingLine.add(newLine.get(indexForReverse));
+                            }
+                            addNewLine = false;
+                            break;
+                        }
+
+                        else if (calculateDistance(newLine.get(0),existingLine.get(0))<15)    //at the beginning            //REVERSED one by one
+                        {
+                            //existingLine.addAll(0,newLine);
+                            for (int indexForReverse=0;indexForReverse<newLine.size();indexForReverse++)
+                            {
+                                existingLine.add(0,newLine.get(indexForReverse));
+                            }
+                            addNewLine = false;
+                            break;
+                        }
+                        else if (calculateDistance(newLine.get(0),existingLine.get(existingLine.size()-1))<15)  //at the end    //OK
                         {
                             existingLine.addAll(newLine);
                             addNewLine = false;
                             break;
                         }
-                    }*/ //poprawic bo moze trzeba odwrocic kolejnosc?
+                        //first from new line check too!
+                    }
                     loc1=loc2;
                     break;
                 }
