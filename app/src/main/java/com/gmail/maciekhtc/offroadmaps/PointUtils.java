@@ -194,12 +194,13 @@ public class PointUtils {
                             break;
                         }
                     }
+                    boolean keepConcatenatedLine = true;
                     if (lineToConcatenateSecondTime!=null) {
                         for (ArrayList<LatLng> existingLine : lines) {
                             if (existingLine==lineToConcatenateSecondTime) continue;
                             if (calculateDistance(lineToConcatenateSecondTime.get(lineToConcatenateSecondTime.size() - 1), existingLine.get(0)) < 25) {
                                 existingLine.addAll(0, lineToConcatenateSecondTime);
-                                addNewLine = false;
+                                keepConcatenatedLine = false;
                                 break;
                             } else if (calculateDistance(lineToConcatenateSecondTime.get(lineToConcatenateSecondTime.size() - 1), existingLine.get(existingLine.size() - 1)) < 15)    //paste this at the end     //REVERSED!
                             {
@@ -207,7 +208,7 @@ public class PointUtils {
                                 for (int indexForReverse = lineToConcatenateSecondTime.size() - 1; indexForReverse >= 0; indexForReverse--) {
                                     existingLine.add(lineToConcatenateSecondTime.get(indexForReverse));
                                 }
-                                addNewLine = false;
+                                keepConcatenatedLine = false;
                                 break;
                             } else if (calculateDistance(lineToConcatenateSecondTime.get(0), existingLine.get(0)) < 25)    //at the beginning            //REVERSED one by one
                             {
@@ -215,16 +216,17 @@ public class PointUtils {
                                 for (int indexForReverse = 0; indexForReverse < lineToConcatenateSecondTime.size(); indexForReverse++) {
                                     existingLine.add(0, lineToConcatenateSecondTime.get(indexForReverse));
                                 }
-                                addNewLine = false;
+                                keepConcatenatedLine = false;
                                 break;
                             } else if (calculateDistance(lineToConcatenateSecondTime.get(0), existingLine.get(existingLine.size() - 1)) < 25)  //at the end    //OK
                             {
                                 existingLine.addAll(lineToConcatenateSecondTime);
-                                addNewLine = false;
+                                keepConcatenatedLine = false;
                                 break;
                             }
                         }
                     }
+                    if (!keepConcatenatedLine) lines.remove(lineToConcatenateSecondTime);
                     loc1=loc2;
                     break;
                 }
