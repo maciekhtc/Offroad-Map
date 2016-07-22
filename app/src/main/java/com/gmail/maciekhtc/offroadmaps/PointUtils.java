@@ -18,6 +18,7 @@ public class PointUtils {
     public static ArrayList<ArrayList<LatLng>> lines = null;
     public static ArrayList<LatLng> newPoints = new ArrayList();
     public static ArrayList<LatLng> junctionPoints = new ArrayList();
+    public static final double limitValue = 4.0;
 
     public static ArrayList<LatLng> pointsFromFile(ArrayList<String> listString)
     {
@@ -54,12 +55,12 @@ public class PointUtils {
         for (int index = newPointsSize-2; index>=0; index--) //check all without last added point, in reverse to find last matching point faster when standing still
         {                                           //without last added because it will help making points closer to each other still with no error
             LatLng point = newPoints.get(index);
-            if (calculateDistance(point,newPoint)<10)
+            if (calculateDistance(point,newPoint)<limitValue*0.8)
             {
                 //prevent recording points when started going back
                 if ((calculateDistance(newPoint,newPoints.get(newPointsSize-2)) <
                         calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2))) &&
-                        calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2)) < 10)
+                        calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2)) < limitValue)
                 {
                     addFlag = false;
                     break;
@@ -67,7 +68,7 @@ public class PointUtils {
                 //
                 int startIndex = newPoints.indexOf(point);
                 LatLng bestPoint = point;
-                for (int i=1;i<12;i++)
+                for (int i=1;i<30;i++)
                 {
                     if (startIndex+i>=newPointsSize) break;
                     if (calculateDistance(bestPoint,newPoint) > calculateDistance(newPoints.get(startIndex+i),newPoint))
@@ -90,11 +91,11 @@ public class PointUtils {
                 ArrayList<LatLng> line = lines.get(lineId);
                 for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
                 {
-                    if (calculateDistance(existingPoint,newPoint)<15)
+                    if (calculateDistance(existingPoint,newPoint)<limitValue)
                     {
                         int startIndex = line.indexOf(existingPoint);
                         LatLng bestPoint = existingPoint;
-                        for (int i=1;i<12;i++)
+                        for (int i=1;i<30;i++)
                         {
                             if (startIndex+i>=line.size()) break;
                             if (calculateDistance(bestPoint, newPoint) > calculateDistance(line.get(startIndex+i),newPoint))
@@ -127,9 +128,11 @@ public class PointUtils {
     public static double calculateDistance(LatLng loc1, LatLng loc2)
     {
         if (loc1 == null || loc2 == null) return 1000;
-        double result=Math.sqrt((loc2.latitude*20000 - loc1.latitude*20000) * (loc2.latitude*20000 - loc1.latitude*20000))+
-                ((loc2.longitude*10000 - loc1.longitude*10000) * (loc2.longitude*10000 - loc1.longitude*10000));
-        return result;
+        //return result=Math.sqrt((loc2.latitude*20000 - loc1.latitude*20000) * (loc2.latitude*20000 - loc1.latitude*20000))+((loc2.longitude*10000 - loc1.longitude*10000) * (loc2.longitude*10000 - loc1.longitude*10000));
+        //float result[] = new float[1]; Location.distanceBetween(loc1.latitude,loc1.longitude,loc2.latitude,loc2.longitude,result); return result[0];
+        double x = (loc2.longitude - loc1.longitude) * Math.cos((loc1.latitude + loc2.latitude) / 2);
+        double y = (loc2.latitude - loc1.latitude);
+        return Math.sqrt(x * x + y * y) * 6371;
     }
     public static void getLines(ArrayList<LatLng> filePoints)
     {
@@ -147,7 +150,7 @@ public class PointUtils {
             while (filePointsIterator.hasNext())
             {
                 LatLng loc2 = filePointsIterator.next();
-                if (calculateDistance(loc1,loc2)<25) {  //when points are too far break and create new line
+                if (calculateDistance(loc1,loc2)<limitValue) {  //when points are too far break and create new line
                     loc1=loc2;
                     newLine.add(loc1);
                     count++;
@@ -162,13 +165,13 @@ public class PointUtils {
             ArrayList<LatLng> lineToConcatenateSecondTime = null;
             for (ArrayList<LatLng> existingLine : lines)
             {
-                if (calculateDistance(newLine.get(newLine.size()-1),existingLine.get(0))<25) {   //paste this at the beginning               //OK
+                if (calculateDistance(newLine.get(newLine.size()-1),existingLine.get(0))<limitValue) {   //paste this at the beginning               //OK
                     existingLine.addAll(0,newLine);
                     addNewLine = false;
                     lineToConcatenateSecondTime = existingLine;
                     break;
                 }
-                else if (calculateDistance(newLine.get(newLine.size()-1),existingLine.get(existingLine.size()-1))<25)    //paste this at the end     //REVERSED!
+                else if (calculateDistance(newLine.get(newLine.size()-1),existingLine.get(existingLine.size()-1))<limitValue)    //paste this at the end     //REVERSED!
                 {
                     //existingLine.addAll(newLine);
                     for (int indexForReverse=newLine.size()-1;indexForReverse>=0;indexForReverse--)
@@ -180,7 +183,7 @@ public class PointUtils {
                     break;
                 }
 
-                else if (calculateDistance(newLine.get(0),existingLine.get(0))<25)    //at the beginning            //REVERSED one by one
+                else if (calculateDistance(newLine.get(0),existingLine.get(0))<limitValue)    //at the beginning            //REVERSED one by one
                 {
                     //existingLine.addAll(0,newLine);
                     for (int indexForReverse=0;indexForReverse<newLine.size();indexForReverse++)
@@ -191,7 +194,7 @@ public class PointUtils {
                     lineToConcatenateSecondTime = existingLine;
                     break;
                 }
-                else if (calculateDistance(newLine.get(0),existingLine.get(existingLine.size()-1))<25)  //at the end    //OK
+                else if (calculateDistance(newLine.get(0),existingLine.get(existingLine.size()-1))<limitValue)  //at the end    //OK
                 {
                     existingLine.addAll(newLine);
                     addNewLine = false;
@@ -203,11 +206,11 @@ public class PointUtils {
             if (lineToConcatenateSecondTime!=null) {
                 for (ArrayList<LatLng> existingLine : lines) {
                     if (existingLine==lineToConcatenateSecondTime) continue;
-                    if (calculateDistance(lineToConcatenateSecondTime.get(lineToConcatenateSecondTime.size() - 1), existingLine.get(0)) < 25) {
+                    if (calculateDistance(lineToConcatenateSecondTime.get(lineToConcatenateSecondTime.size() - 1), existingLine.get(0)) < limitValue) {
                         existingLine.addAll(0, lineToConcatenateSecondTime);
                         keepConcatenatedLine = false;
                         break;
-                    } else if (calculateDistance(lineToConcatenateSecondTime.get(lineToConcatenateSecondTime.size() - 1), existingLine.get(existingLine.size() - 1)) < 15)    //paste this at the end     //REVERSED!
+                    } else if (calculateDistance(lineToConcatenateSecondTime.get(lineToConcatenateSecondTime.size() - 1), existingLine.get(existingLine.size() - 1)) < limitValue)    //paste this at the end     //REVERSED!
                     {
                         //existingLine.addAll(newLine);
                         for (int indexForReverse = lineToConcatenateSecondTime.size() - 1; indexForReverse >= 0; indexForReverse--) {
@@ -215,7 +218,7 @@ public class PointUtils {
                         }
                         keepConcatenatedLine = false;
                         break;
-                    } else if (calculateDistance(lineToConcatenateSecondTime.get(0), existingLine.get(0)) < 25)    //at the beginning            //REVERSED one by one
+                    } else if (calculateDistance(lineToConcatenateSecondTime.get(0), existingLine.get(0)) < limitValue)    //at the beginning            //REVERSED one by one
                     {
                         //existingLine.addAll(0,newLine);
                         for (int indexForReverse = 0; indexForReverse < lineToConcatenateSecondTime.size(); indexForReverse++) {
@@ -223,7 +226,7 @@ public class PointUtils {
                         }
                         keepConcatenatedLine = false;
                         break;
-                    } else if (calculateDistance(lineToConcatenateSecondTime.get(0), existingLine.get(existingLine.size() - 1)) < 25)  //at the end    //OK
+                    } else if (calculateDistance(lineToConcatenateSecondTime.get(0), existingLine.get(existingLine.size() - 1)) < limitValue)  //at the end    //OK
                     {
                         existingLine.addAll(lineToConcatenateSecondTime);
                         keepConcatenatedLine = false;
@@ -255,10 +258,10 @@ public class PointUtils {
                 for (int indexOfComparedPoint = 0;indexOfComparedPoint<comparedLine.size();indexOfComparedPoint++) {
                     LatLng comparedPoint = comparedLine.get(indexOfComparedPoint);
                     if (!(line == comparedLine && (indexOfComparedPoint > comparedLine.size()-8 || indexOfComparedPoint < 8))) {
-                        if (calculateDistance(comparedPoint, line.get(0)) < 25) {
+                        if (calculateDistance(comparedPoint, line.get(0)) < limitValue) {
                             int startIndex = comparedLine.indexOf(comparedPoint);
                             LatLng bestPoint = comparedPoint;
-                            for (int i = 1; i < 12; i++) {
+                            for (int i = 1; i < 30; i++) {
                                 if (startIndex + i >= comparedLine.size()) break;
                                 if (calculateDistance(bestPoint, line.get(0)) > calculateDistance(comparedLine.get(startIndex + i), line.get(0))) {
                                     bestPoint = comparedLine.get(startIndex + i);
@@ -271,10 +274,10 @@ public class PointUtils {
                             junctionPoints.add(bestPoint);
                             Log.d("OffroadMap", "Found junction " + bestPoint.toString());
                             break;
-                        } else if (calculateDistance(comparedPoint, line.get(line.size() - 1)) < 25) {
+                        } else if (calculateDistance(comparedPoint, line.get(line.size() - 1)) < limitValue) {
                             int startIndex = comparedLine.indexOf(comparedPoint);
                             LatLng bestPoint = comparedPoint;
-                            for (int i = 1; i < 12; i++) {
+                            for (int i = 1; i < 30; i++) {
                                 if (startIndex + i >= comparedLine.size()) break;
                                 if (calculateDistance(bestPoint, line.get(line.size() - 1)) > calculateDistance(comparedLine.get(startIndex + i), line.get(line.size() - 1))) {
                                     bestPoint = comparedLine.get(startIndex + i);
