@@ -56,9 +56,12 @@ public class User {
     public LatLng getLatLng() {
         return new LatLng(lat,lon);
     }
+
     public void updateMarker(){
         if (toDelete)
         {
+            //toDelete == true so i can speak about user disconnected
+            if (Settings.speakMessages) SpeakUtils.tts.speak("Znikł: "+username, TextToSpeech.QUEUE_ADD, null);
             this.marker.setVisible(false);
             this.marker.remove();
             this.marker = null;
@@ -82,6 +85,9 @@ public class User {
         }
         else
         {
+            //marker == null so now i can speak about user connected
+            if (Settings.speakMessages) SpeakUtils.tts.speak("Dołączył: "+username, TextToSpeech.QUEUE_ADD, null);
+            Log.d("OffroadMap", "Added online user " + username);
             marker = MapUtils.mMap.addMarker(new MarkerOptions()
                     .position(getLatLng())
                     .title(username));
