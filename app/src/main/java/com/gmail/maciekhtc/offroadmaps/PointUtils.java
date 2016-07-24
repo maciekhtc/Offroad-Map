@@ -68,18 +68,20 @@ public class PointUtils {
                 //
                 int startIndex = newPoints.indexOf(point);
                 LatLng bestPoint = point;
+                int indexDelta=0;
                 for (int i=1;i<30;i++)
                 {
                     if (startIndex+i>=newPointsSize) break;
                     if (calculateDistance(bestPoint,newPoint) > calculateDistance(newPoints.get(startIndex+i),newPoint))
                     {
                         bestPoint=newPoints.get(startIndex+i);
+                        indexDelta=i;
                     }
                     //todo if distance becomes really high it means new line was started here so previous point is junction point?
                 }
                 //do not speak for 5 latest added points
-                if (Settings.speakCorners && (newPoints.indexOf(point)<(newPointsSize-5))) SpeakUtils.newPosition(newPoints.indexOf(bestPoint), newPoints);
-                if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(bestPoint), modifyPoint(bestPoint, newPoint));
+                if (Settings.speakCorners && ((startIndex+indexDelta)<(newPointsSize-5))) SpeakUtils.newPosition((startIndex+indexDelta), newPoints);
+                if (Settings.saveNewPoints) newPoints.set((startIndex+indexDelta), modifyPoint(bestPoint, newPoint));
                 addFlag=false;
                 break;
             }
@@ -95,12 +97,14 @@ public class PointUtils {
                     {
                         int startIndex = line.indexOf(existingPoint);
                         LatLng bestPoint = existingPoint;
+                        int indexDelta=0;
                         for (int i=1;i<30;i++)
                         {
                             if (startIndex+i>=line.size()) break;
                             if (calculateDistance(bestPoint, newPoint) > calculateDistance(line.get(startIndex+i),newPoint))
                             {
                                 bestPoint=line.get(startIndex+i);
+                                indexDelta=i;
                             }
                         }
                         boolean flag = true;
@@ -112,8 +116,8 @@ public class PointUtils {
                                 break;
                             }
                         }
-                        if (Settings.speakCorners) SpeakUtils.newPosition(line.indexOf(bestPoint), line);
-                        if (Settings.saveNewPoints && flag) line.set(line.indexOf(bestPoint), modifyPoint(bestPoint, newPoint));
+                        if (Settings.speakCorners) SpeakUtils.newPosition((startIndex+indexDelta), line);
+                        if (Settings.saveNewPoints && flag) line.set((startIndex+indexDelta), modifyPoint(bestPoint, newPoint));
                         addFlag=false;
                         break;
                     }
