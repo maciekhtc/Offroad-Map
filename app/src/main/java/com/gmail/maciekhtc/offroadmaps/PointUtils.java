@@ -77,9 +77,9 @@ public class PointUtils {
                     }
                     //todo if distance becomes really high it means new line was started here so previous point is junction point?
                 }
-                if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(bestPoint),modifyPoint(bestPoint, newPoint));
                 //do not speak for 5 latest added points
                 if (Settings.speakCorners && (newPoints.indexOf(point)<(newPointsSize-5))) SpeakUtils.newPosition(newPoints.indexOf(bestPoint), newPoints);
+                if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(bestPoint), modifyPoint(bestPoint, newPoint));
                 addFlag=false;
                 break;
             }
@@ -112,8 +112,8 @@ public class PointUtils {
                                 break;
                             }
                         }
-                        if (Settings.saveNewPoints && flag) line.set(line.indexOf(bestPoint),modifyPoint(bestPoint, newPoint));
                         if (Settings.speakCorners) SpeakUtils.newPosition(line.indexOf(bestPoint), line);
+                        if (Settings.saveNewPoints && flag) line.set(line.indexOf(bestPoint), modifyPoint(bestPoint, newPoint));
                         addFlag=false;
                         break;
                     }
