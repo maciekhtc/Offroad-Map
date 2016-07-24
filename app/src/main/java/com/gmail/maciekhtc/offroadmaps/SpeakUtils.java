@@ -23,7 +23,7 @@ public class SpeakUtils {
         if (indexOfPoint!=-1 && indexOfPoint<currentLine.size()) {
             for (LatLng junction : PointUtils.junctionPoints)
             {
-                if (PointUtils.calculateDistance(currentLine.get(indexOfPoint),junction)<10)
+                if (PointUtils.calculateDistance(currentLine.get(indexOfPoint),junction)<6)
                 {
                     roadCross();
                     break;
@@ -42,7 +42,7 @@ public class SpeakUtils {
                     LatLng point3=currentLine.get(indexOfPoint+6);
                     Log.d("OffroadMap", "moving to higher index");
                     corner(calculateAngle(point1, point2, point3));
-                    watchOut = false;
+                    //watchOut = false;
                 }
                 else
                 {
@@ -58,7 +58,7 @@ public class SpeakUtils {
                     LatLng point3=currentLine.get(indexOfPoint-6);
                     Log.d("OffroadMap", "moving to lower index");
                     corner(calculateAngle(point1, point2, point3));
-                    watchOut = false;
+                    //watchOut = false;
                 }
                 else
                 {
@@ -119,6 +119,7 @@ public class SpeakUtils {
         else if (cornerAngle < 170) message+="6";
         else if (cornerAngle <= 180) message="";    //straight
         else message="błąd";   //not needed ?
+        if (!(cornerMessage.contentEquals("")||cornerMessage.contentEquals("błąd"))) watchOut=false;
         if (!cornerMessage.contentEquals("")&&!message.contentEquals("")) message = "do " + message;
         if (!message.contentEquals("")) tts.speak(message, TextToSpeech.QUEUE_ADD, null);
         cornerMessage = message;
