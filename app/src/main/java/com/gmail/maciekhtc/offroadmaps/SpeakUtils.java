@@ -21,14 +21,17 @@ public class SpeakUtils {
     public static void newPosition(int indexOfPoint, ArrayList<LatLng> currentLine)
     {
         if (indexOfPoint!=-1 && indexOfPoint<currentLine.size()) {
+            boolean junctionFlag = false;
             for (LatLng junction : PointUtils.junctionPoints)
             {
                 if (PointUtils.calculateDistance(currentLine.get(indexOfPoint),junction)<6)
                 {
                     roadCross();
+                    junctionFlag = true;
                     break;
                 }
             }
+            if (!junctionFlag) watchOut=false;
         }
         //
         if (currentLine == currentLineOld)
