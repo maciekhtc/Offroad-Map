@@ -20,77 +20,69 @@ public class SpeakUtils {
 
     public static void newPosition(int indexOfPoint, ArrayList<LatLng> currentLine)
     {
-        if (indexOfPoint!=-1 && indexOfPoint<currentLine.size()) {
-            boolean junctionFlag = false;
-            for (LatLng junction : PointUtils.junctionPoints)
-            {
-                if (PointUtils.calculateDistance(currentLine.get(indexOfPoint),junction)<6)
-                {
-                    roadCross();
-                    junctionFlag = true;
-                    break;
+        try {
+            if (indexOfPoint != -1 && indexOfPoint < currentLine.size()) {
+                boolean junctionFlag = false;
+                for (LatLng junction : PointUtils.junctionPoints) {
+                    if (PointUtils.calculateDistance(currentLine.get(indexOfPoint), junction) < 6) {
+                        roadCross();
+                        junctionFlag = true;
+                        break;
+                    }
                 }
+                watchOut = junctionFlag;
             }
-            if (!junctionFlag) watchOut=false;
+            //
+            if (currentLine == currentLineOld) {
+                if (indexOfPoint > indexOfPointOld) {   //moving to higher index
+                    if (currentLine.size() - 1 >= indexOfPoint + 7) {
+                        LatLng point1 = currentLine.get(indexOfPoint + 2);
+                        LatLng point2 = currentLine.get(indexOfPoint + 4);
+                        LatLng point3 = currentLine.get(indexOfPoint + 7);
+                        Log.d("OffroadMap", "moving to higher index");
+                        corner(calculateAngle(point1, point2, point3));
+                        //watchOut = false;
+                    } else {
+                        roadCross();
+                    }
+                } else if (indexOfPoint < indexOfPointOld) {   //moving to lower index
+                    if (0 <= indexOfPoint - 7) {
+                        LatLng point1 = currentLine.get(indexOfPoint - 2);
+                        LatLng point2 = currentLine.get(indexOfPoint - 4);
+                        LatLng point3 = currentLine.get(indexOfPoint - 7);
+                        Log.d("OffroadMap", "moving to lower index");
+                        corner(calculateAngle(point1, point2, point3));
+                        //watchOut = false;
+                    } else {
+                        roadCross();
+                    }
+                } else {   //standing still
+                    //MapUtils.mMap.addMarker(new MarkerOptions().position(currentLine.get(indexOfPoint)));
+                }
+            } else {   //change line, road cross?
+                //Log.d("OffroadMap", "Line change");
+                roadCross();
+            }
+            //update positiond
+            currentLineOld = currentLine;
+            indexOfPointOld = indexOfPoint;
         }
-        //
-        if (currentLine == currentLineOld)
+        catch (Exception e)
         {
-            if (indexOfPoint > indexOfPointOld)
-            {   //moving to higher index
-                if (currentLine.size()-1>=indexOfPoint+6)
-                {
-                    LatLng point1=currentLine.get(indexOfPoint+2);
-                    LatLng point2=currentLine.get(indexOfPoint+4);
-                    LatLng point3=currentLine.get(indexOfPoint+6);
-                    Log.d("OffroadMap", "moving to higher index");
-                    corner(calculateAngle(point1, point2, point3));
-                    //watchOut = false;
-                }
-                else
-                {
-                    roadCross();
-                }
-            }
-            else if (indexOfPoint < indexOfPointOld)
-            {   //moving to lower index
-                if (0<=indexOfPoint-6)
-                {
-                    LatLng point1=currentLine.get(indexOfPoint-2);
-                    LatLng point2=currentLine.get(indexOfPoint-4);
-                    LatLng point3=currentLine.get(indexOfPoint-6);
-                    Log.d("OffroadMap", "moving to lower index");
-                    corner(calculateAngle(point1, point2, point3));
-                    //watchOut = false;
-                }
-                else
-                {
-                    roadCross();
-                }
-            }
-            else
-            {   //standing still
-                //MapUtils.mMap.addMarker(new MarkerOptions().position(currentLine.get(indexOfPoint)));
-            }
+            e.printStackTrace();    //encountered one unexpected behaviour, happened only one time,
+                                    // app was closed, dont know if crashed or cleaned from memory, will be investigated
         }
-        else
-        {   //change line, road cross?
-            //Log.d("OffroadMap", "Line change");
-            roadCross();
-        }
-        //update positiond
-        currentLineOld = currentLine;
-        indexOfPointOld = indexOfPoint;
     }
 
     private static double calculateAngle(LatLng point1, LatLng point2, LatLng point3) {
+        if (point1==null||point2==null||point3==null) return 180;   //some kind of workaround for situation when a point is null?
         double alpha = Math.atan2(point1.latitude - point2.latitude, point1.longitude - point2.longitude);
         double beta = Math.atan2(point3.latitude-point2.latitude,point3.longitude-point2.longitude);
         double result = Math.toDegrees(alpha)-Math.toDegrees(beta);
         if (result > 180) result = -(360 - result);
         else if (result < -180) result = (result + 360);
         Log.d("OffroadMap", "Angle: " + result + " / " + point1.toString() + " " + point2.toString() + " " + point3.toString());
-        return (result);
+        return result;
     }
 
     private static void roadCross() {
@@ -122,7 +114,7 @@ public class SpeakUtils {
         else if (cornerAngle < 170) message+="6";
         else if (cornerAngle <= 180) message="";    //straight
         else message="błąd";   //not needed ?
-        if (!(cornerMessage.contentEquals("")||cornerMessage.contentEquals("błąd"))) watchOut=false;
+        if (!cornerMessage.contentEquals("")) watchOut=false;
         if (!cornerMessage.contentEquals("")&&!message.contentEquals("")) message = "do " + message;
         if (!message.contentEquals("")) tts.speak(message, TextToSpeech.QUEUE_ADD, null);
         cornerMessage = message;

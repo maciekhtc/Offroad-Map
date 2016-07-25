@@ -52,10 +52,11 @@ public class PointUtils {
         boolean addFlag = true;
         //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
         int newPointsSize = newPoints.size();
-        for (int index = newPointsSize-2; index>=0; index--) //check all without last added point, in reverse to find last matching point faster when standing still
+        for (int index = newPointsSize-3; index>=0; index--) //check all without last 2 added point, in reverse to find last matching point faster when standing still
         {                                           //without last added because it will help making points closer to each other still with no error
+                            //changed start index from size-2 to size-3, to try record more points
             LatLng point = newPoints.get(index);
-            if (calculateDistance(point,newPoint)<limitValue*0.8)
+            if (calculateDistance(point,newPoint)<limitValue*0.6)   //from 0.8 to 0.6 to be able to record points more frequently
             {
                 //prevent recording points when started going back
                 if ((calculateDistance(newPoint,newPoints.get(newPointsSize-2)) <
