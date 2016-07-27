@@ -16,6 +16,7 @@ import java.util.ListIterator;
  */
 public class PointUtils {
     public static ArrayList<ArrayList<LatLng>> lines = null;
+    public static boolean linesReady = false;
     public static ArrayList<LatLng> newPoints = new ArrayList();
     public static ArrayList<LatLng> junctionPoints = new ArrayList();
     public static final double limitValue = 4.0;
@@ -243,6 +244,7 @@ public class PointUtils {
             if (addNewLine) lines.add(newLine);
         }
         optimizeLines();
+        linesReady = true;
         Log.d("OffroadMap", "Lined points: " + count + ", in file: " + filePoints.size()+", in lines: "+lines.size());
     }
     private static LatLng modifyPoint(LatLng existingPoint, LatLng newPoint)

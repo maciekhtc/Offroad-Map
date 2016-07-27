@@ -230,12 +230,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //
         mMap.setMyLocationEnabled(true);
         //
-        currentLine=mMap.addPolyline(new PolylineOptions().color(Color.RED).width(2.5f));
+        currentLine=mMap.addPolyline(new PolylineOptions().color(Color.RED).width(3.5f));
         currentLinePoints = new ArrayList();
         //
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 150, null);
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 100, null);
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
@@ -262,15 +262,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 positionThread.myLon = location.getLongitude();
             } catch (ConcurrentModificationException e) {e.printStackTrace();}
         }
-        if (PointUtils.lines != null && !linesDrawn)
-            drawLines();  //draw lines on map when not drawn and ready (lines not null)
+        if (PointUtils.linesReady && !linesDrawn)
+            drawLines();  //draw lines on map when ready and not drawn
     }
     private void drawLines()
     {
         linesDrawn = true;
         for (ArrayList<LatLng> line:PointUtils.lines)
         {
-            mMap.addPolyline(new PolylineOptions().addAll(line).color(Color.WHITE).width(2.0f));
+            mMap.addPolyline(new PolylineOptions().addAll(line).color(Color.WHITE).width(2.8f));
         }
     }
 
