@@ -16,7 +16,7 @@ import java.util.LinkedList;
  * Created by 15936 on 05.06.2016.
  */
 public class FileUtils {
-    private static String filePath = Environment.getExternalStorageDirectory() + "/OffroadMap/";
+    public static String filePath = Environment.getExternalStorageDirectory() + "/OffroadMap/";
 
     public static ArrayList<String> fileInit() {
         ArrayList<String> listString = new ArrayList();
