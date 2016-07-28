@@ -19,7 +19,7 @@ public class PointUtils {
     public static boolean linesReady = false;
     public static ArrayList<LatLng> newPoints = new ArrayList();
     public static ArrayList<LatLng> junctionPoints = new ArrayList();
-    public static final double limitValue = 4.0;
+    public static final double limitValue = 7.0;
 
     public static ArrayList<LatLng> pointsFromFile(ArrayList<String> listString)
     {
@@ -57,12 +57,12 @@ public class PointUtils {
         {                                           //without last added because it will help making points closer to each other still with no error
                             //changed start index from size-2 to size-3, to try record more points
             LatLng point = newPoints.get(index);
-            if (calculateDistance(point,newPoint)<limitValue*0.6)   //from 0.8 to 0.6 to be able to record points more frequently
+            if (calculateDistance(point,newPoint)<limitValue*0.2)
             {
                 //prevent recording points when started going back
                 if ((calculateDistance(newPoint,newPoints.get(newPointsSize-2)) <
                         calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2))) &&
-                        calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2)) < limitValue)
+                        calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2)) < limitValue*0.5)
                 {
                     addFlag = false;
                     break;
@@ -95,7 +95,7 @@ public class PointUtils {
                 ArrayList<LatLng> line = lines.get(lineId);
                 for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
                 {
-                    if (calculateDistance(existingPoint,newPoint)<limitValue)
+                    if (calculateDistance(existingPoint,newPoint)<limitValue*0.5)
                     {
                         int startIndex = line.indexOf(existingPoint);
                         LatLng bestPoint = existingPoint;
@@ -249,7 +249,7 @@ public class PointUtils {
     }
     private static LatLng modifyPoint(LatLng existingPoint, LatLng newPoint)
     {
-        double factor=0.05;
+        double factor=0.02;
         double newLatitude = ((existingPoint.latitude * (1 - factor)) + (newPoint.latitude * factor));
         double newLongitude = ((existingPoint.longitude * (1 - factor)) + (newPoint.longitude * factor));
         return new LatLng(newLatitude,newLongitude);

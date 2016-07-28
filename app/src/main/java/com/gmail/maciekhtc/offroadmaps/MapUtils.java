@@ -1,5 +1,6 @@
 package com.gmail.maciekhtc.offroadmaps;
 
+import android.app.Notification;
 import android.location.Location;
 
 import com.google.android.gms.maps.GoogleMap;

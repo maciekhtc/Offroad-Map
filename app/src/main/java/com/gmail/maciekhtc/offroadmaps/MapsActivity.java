@@ -1,6 +1,8 @@
 package com.gmail.maciekhtc.offroadmaps;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -15,6 +17,7 @@ import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -82,10 +85,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(!(Thread.getDefaultUncaughtExceptionHandler() instanceof CustomExceptionHandler)) {
-            Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
-                    FileUtils.filePath));
-        }
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -158,7 +157,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         positionThread.setDeviceId(InstanceID.getInstance(getApplicationContext()).getId());
         positionThread.start();
 
-        PointUtils.getLines(PointUtils.pointsFromFile(FileUtils.fileInit()));
+        if(!(Thread.getDefaultUncaughtExceptionHandler() instanceof CustomExceptionHandler)) {
+            Thread.setDefaultUncaughtExceptionHandler(new CustomExceptionHandler(
+                    FileUtils.filePath));
+        }
+
+        if (PointUtils.lines==null) PointUtils.getLines(PointUtils.pointsFromFile(FileUtils.fileInit()));
         loadSettings();
         //
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
