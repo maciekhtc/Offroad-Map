@@ -19,7 +19,9 @@ public class PointUtils {
     public static boolean linesReady = false;
     public static ArrayList<LatLng> newPoints = new ArrayList();
     public static ArrayList<LatLng> junctionPoints = new ArrayList();
-    public static final double limitValue = 7.0;
+    public static final double limitValue = 4.0;
+    private static boolean lineEnded = true;
+    private static LatLng modPoint = null;
 
     public static ArrayList<LatLng> pointsFromFile(ArrayList<String> listString)
     {
@@ -57,12 +59,12 @@ public class PointUtils {
         {                                           //without last added because it will help making points closer to each other still with no error
                             //changed start index from size-2 to size-3, to try record more points
             LatLng point = newPoints.get(index);
-            if (calculateDistance(point,newPoint)<limitValue*0.2)
+            if (calculateDistance(point,newPoint)<limitValue*0.3)
             {
                 //prevent recording points when started going back
                 if ((calculateDistance(newPoint,newPoints.get(newPointsSize-2)) <
                         calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2))) &&
-                        calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2)) < limitValue*0.5)
+                        calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2)) < limitValue*0.3)
                 {
                     addFlag = false;
                     break;
@@ -79,11 +81,11 @@ public class PointUtils {
                         bestPoint=newPoints.get(startIndex+i);
                         indexDelta=i;
                     }
-                    //todo if distance becomes really high it means new line was started here so previous point is junction point?
                 }
                 //do not speak for 5 latest added points
                 if (Settings.speakCorners && ((startIndex+indexDelta)<(newPointsSize-5))) SpeakUtils.newPosition((startIndex+indexDelta), newPoints);
-                if (Settings.saveNewPoints) newPoints.set((startIndex+indexDelta), modifyPoint(bestPoint, newPoint));
+                modPoint = modifyPoint(bestPoint, newPoint);
+                if (Settings.saveNewPoints) newPoints.set((startIndex+indexDelta), modPoint);
                 addFlag=false;
                 break;
             }
@@ -95,7 +97,7 @@ public class PointUtils {
                 ArrayList<LatLng> line = lines.get(lineId);
                 for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
                 {
-                    if (calculateDistance(existingPoint,newPoint)<limitValue*0.5)
+                    if (calculateDistance(existingPoint,newPoint)<limitValue*0.3)
                     {
                         int startIndex = line.indexOf(existingPoint);
                         LatLng bestPoint = existingPoint;
@@ -119,7 +121,10 @@ public class PointUtils {
                             }
                         }
                         if (Settings.speakCorners) SpeakUtils.newPosition((startIndex+indexDelta), line);
-                        if (Settings.saveNewPoints && flag) line.set((startIndex+indexDelta), modifyPoint(bestPoint, newPoint));
+                        if (Settings.saveNewPoints && flag) {
+                            modPoint = modifyPoint(bestPoint, newPoint);
+                            line.set((startIndex+indexDelta), modPoint);
+                        }
                         addFlag=false;
                         break;
                     }
@@ -127,8 +132,9 @@ public class PointUtils {
                 if (!addFlag) break;
             }
         }
+        if ((addFlag == lineEnded) && Settings.saveNewPoints && modPoint!=null) newPoints.add(modPoint);
         if (addFlag && Settings.saveNewPoints) newPoints.add(newPoint);
-
+        lineEnded = !addFlag;
     }
 
     public static double calculateDistance(LatLng loc1, LatLng loc2)
@@ -264,7 +270,7 @@ public class PointUtils {
             for (ArrayList<LatLng> comparedLine : lines) {
                 for (int indexOfComparedPoint = 0;indexOfComparedPoint<comparedLine.size();indexOfComparedPoint++) {
                     LatLng comparedPoint = comparedLine.get(indexOfComparedPoint);
-                    if (!(line == comparedLine && (indexOfComparedPoint > comparedLine.size()-8 || indexOfComparedPoint < 8))) {
+                    if (!(comparedLine==line && (indexOfComparedPoint > comparedLine.size()-8 || indexOfComparedPoint < 8))) {
                         if (calculateDistance(comparedPoint, line.get(0)) < limitValue) {
                             int startIndex = comparedLine.indexOf(comparedPoint);
                             LatLng bestPoint = comparedPoint;
@@ -284,7 +290,7 @@ public class PointUtils {
                         } else if (calculateDistance(comparedPoint, line.get(line.size() - 1)) < limitValue) {
                             int startIndex = comparedLine.indexOf(comparedPoint);
                             LatLng bestPoint = comparedPoint;
-                            for (int i = 1; i < 30; i++) {
+                            for (int i = 0; i < 30; i++) {
                                 if (startIndex + i >= comparedLine.size()) break;
                                 if (calculateDistance(bestPoint, line.get(line.size() - 1)) > calculateDistance(comparedLine.get(startIndex + i), line.get(line.size() - 1))) {
                                     bestPoint = comparedLine.get(startIndex + i);
