@@ -9,9 +9,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
@@ -19,6 +21,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -42,6 +45,7 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.Locale;
+import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener {
 
@@ -62,6 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean gpsEnabled = false;
     private int accuracyGood = 0;
     private Location previousLocation;
+    private int mapHeight;
 //http://student.pwsz.elblag.pl/~15936/OffroadMap/getUsers.php?deviceId=User32323211dsf&username=inny&lat=54.1752883&lon=19.4068716&group=fornewones&msg=empty
 
     @Override
@@ -93,6 +98,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        //
+        Display display = getWindowManager().getDefaultDisplay();
+        mapHeight = display.getHeight();
         //
         //
 
@@ -234,11 +242,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         MapUtils.mMap = this.mMap;
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 60, null);
+        //mMap.moveCamera(CameraUpdateFactory.zoomTo(18));
         //
         mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setRotateGesturesEnabled(false);
+        mMap.getUiSettings().setTiltGesturesEnabled(false);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.getUiSettings().setCompassEnabled(false);
+        mMap.setPadding(0, mapHeight / 3, 0, 0);
         //
-        currentLine=mMap.addPolyline(new PolylineOptions().color(Color.RED).width(3.5f));
+        currentLine=mMap.addPolyline(new PolylineOptions().color(Color.RED).width(5.0f));
         currentLinePoints = new ArrayList();
         //
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
@@ -246,22 +259,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
+                float zoomLevel = mMap.getCameraPosition().zoom;
+                if (zoomLevel < 12) zoomLevel = 16;
                 if (Settings.followMyPosition) {
+                    /*Point screenLocation = mMap.getProjection().toScreenLocation(MapUtils.latlngFromLocation(location));
+                    screenLocation.y -= mapHeight/2;
+                    LatLng offsetTarget = mMap.getProjection().fromScreenLocation(screenLocation);*/
+                    //mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)),100,null);
                     float bearing = 0;
                     if (previousLocation != null) bearing = previousLocation.bearingTo(location);
                     CameraPosition currentPlace = new CameraPosition.Builder()
                             .target(MapUtils.latlngFromLocation(location))
-                            .bearing(bearing).tilt(65.5f).zoom(mMap.getCameraPosition().zoom).build();
+                            .bearing(bearing).tilt(65.5f).zoom(zoomLevel).build();
                     mMap.animateCamera(CameraUpdateFactory.newCameraPosition(currentPlace));
-                    //mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
                 }
                 else {
                     CameraPosition currentPlace = new CameraPosition.Builder()
-                            .target(MapUtils.latlngFromLocation(location))
+                            .target(mMap.getCameraPosition().target)
                             .bearing(0).tilt(0.0f).zoom(mMap.getCameraPosition().zoom).build();
                     mMap.animateCamera(CameraUpdateFactory.newCameraPosition(currentPlace));
                 }
-                previousLocation = location;
+                double distance = PointUtils.calculateDistance(MapUtils.latlngFromLocation(previousLocation),MapUtils.latlngFromLocation(location));
+                if (distance > 15 && distance != 1000)
+                    previousLocation = location;
                 if (!gpsEnabled)
                     locationChange(location);                  //disable location from map if gps provider is able to detect location
                 MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
@@ -294,7 +314,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         linesDrawn = true;
         for (ArrayList<LatLng> line:PointUtils.lines)
         {
-            mMap.addPolyline(new PolylineOptions().addAll(line).color(Color.WHITE).width(2.8f));
+            mMap.addPolyline(new PolylineOptions().addAll(line).color(Color.WHITE).width(4.5f));
         }
     }
 
