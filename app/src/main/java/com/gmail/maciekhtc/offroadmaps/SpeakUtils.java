@@ -35,10 +35,10 @@ public class SpeakUtils {
             //
             if (currentLine == currentLineOld) {
                 if (indexOfPoint > indexOfPointOld) {   //moving to higher index
-                    if (currentLine.size() - 1 >= indexOfPoint + 7) {
-                        LatLng point1 = currentLine.get(indexOfPoint + 2);
-                        LatLng point2 = currentLine.get(indexOfPoint + 4);
-                        LatLng point3 = currentLine.get(indexOfPoint + 7);
+                    if (currentLine.size() - 1 >= indexOfPoint + 8) {
+                        LatLng point1 = currentLine.get(indexOfPoint + 3);
+                        LatLng point2 = currentLine.get(indexOfPoint + 5);
+                        LatLng point3 = currentLine.get(indexOfPoint + 8);
                         Log.d("OffroadMap", "moving to higher index");
                         corner(calculateAngle(point1, point2, point3));
                         //watchOut = false;
@@ -46,10 +46,10 @@ public class SpeakUtils {
                         roadCross();
                     }
                 } else if (indexOfPoint < indexOfPointOld) {   //moving to lower index
-                    if (0 <= indexOfPoint - 7) {
-                        LatLng point1 = currentLine.get(indexOfPoint - 2);
-                        LatLng point2 = currentLine.get(indexOfPoint - 4);
-                        LatLng point3 = currentLine.get(indexOfPoint - 7);
+                    if (0 <= indexOfPoint - 8) {
+                        LatLng point1 = currentLine.get(indexOfPoint - 3);
+                        LatLng point2 = currentLine.get(indexOfPoint - 5);
+                        LatLng point3 = currentLine.get(indexOfPoint - 8);
                         Log.d("OffroadMap", "moving to lower index");
                         corner(calculateAngle(point1, point2, point3));
                         //watchOut = false;
