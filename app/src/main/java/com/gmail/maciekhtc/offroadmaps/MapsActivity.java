@@ -59,6 +59,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Polyline currentLine = null;
     ArrayList<LatLng> currentLinePoints = null;
     boolean gpsEnabled = false;
+    private int accuracyGood = 0;
 //http://student.pwsz.elblag.pl/~15936/OffroadMap/getUsers.php?deviceId=User32323211dsf&username=inny&lat=54.1752883&lon=19.4068716&group=fornewones&msg=empty
 
     @Override
@@ -253,13 +254,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
     private void locationChange(Location location)
     {
-        if (location.getAccuracy() < 20) {
+        double accuracyLevel = 15;
+        if (location.getAccuracy() > accuracyLevel) accuracyGood = 0;  //introduce a delay causing first 3 accurate locations to be omit
+        if (accuracyGood >= 3) {
             if (Settings.saveNewPoints || Settings.speakCorners) {
                 PointUtils.processNewPoint(location);   //add point to newPoints list which will be saved to the file
             }
             currentLinePoints.add(MapUtils.latlngFromLocation(location)); //add current point to the  list of red line
             currentLine.setPoints(currentLinePoints);   //draw red line from points
         }
+        if (location.getAccuracy() <= accuracyLevel && accuracyGood < 3) accuracyGood++;
         if (Settings.updateOnline) {
             try {
                 positionThread.myLat = location.getLatitude();

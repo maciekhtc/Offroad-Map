@@ -132,7 +132,10 @@ public class PointUtils {
                 if (!addFlag) break;
             }
         }
-        if ((addFlag == lineEnded) && Settings.saveNewPoints && modPoint!=null) newPoints.add(modPoint);
+        if ((addFlag == lineEnded) && Settings.saveNewPoints && modPoint!=null) {
+            newPoints.add(modPoint);
+            junctionPoints.add(modPoint);
+        }
         if (addFlag && Settings.saveNewPoints) newPoints.add(newPoint);
         lineEnded = !addFlag;
     }
