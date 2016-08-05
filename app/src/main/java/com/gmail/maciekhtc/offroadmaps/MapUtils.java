@@ -28,6 +28,7 @@ public class MapUtils {
     }
     public static LatLng latlngFromLocation(Location input)
     {
+        if (input==null) return null;
         return new LatLng(input.getLatitude(),input.getLongitude());
     }
     public static void updateOnlineUsers() {
