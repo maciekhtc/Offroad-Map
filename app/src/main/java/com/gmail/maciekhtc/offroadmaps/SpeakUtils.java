@@ -24,7 +24,7 @@ public class SpeakUtils {
             if (indexOfPoint != -1 && indexOfPoint < currentLine.size()) {
                 boolean junctionFlag = false;
                 for (LatLng junction : PointUtils.junctionPoints) {
-                    if (PointUtils.calculateDistance(currentLine.get(indexOfPoint), junction) < 6) {
+                    if (PointUtils.calculateDistance(currentLine.get(indexOfPoint), junction) < 10) {
                         roadCross();
                         junctionFlag = true;
                         break;
