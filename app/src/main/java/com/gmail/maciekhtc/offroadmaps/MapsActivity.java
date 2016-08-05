@@ -33,6 +33,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -60,6 +61,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     ArrayList<LatLng> currentLinePoints = null;
     boolean gpsEnabled = false;
     private int accuracyGood = 0;
+    private Location previousLocation;
 //http://student.pwsz.elblag.pl/~15936/OffroadMap/getUsers.php?deviceId=User32323211dsf&username=inny&lat=54.1752883&lon=19.4068716&group=fornewones&msg=empty
 
     @Override
@@ -232,6 +234,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         MapUtils.mMap = this.mMap;
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 60, null);
         //
         mMap.setMyLocationEnabled(true);
         //
@@ -240,12 +243,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 100, null);
         mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
-                if (Settings.followMyPosition)
-                    mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
+                if (Settings.followMyPosition) {
+                    float bearing = 0;
+                    if (previousLocation != null) bearing = previousLocation.bearingTo(location);
+                    CameraPosition currentPlace = new CameraPosition.Builder()
+                            .target(MapUtils.latlngFromLocation(location))
+                            .bearing(bearing).tilt(65.5f).zoom(mMap.getCameraPosition().zoom).build();
+                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(currentPlace));
+                    //mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)));
+                }
+                else {
+                    CameraPosition currentPlace = new CameraPosition.Builder()
+                            .target(MapUtils.latlngFromLocation(location))
+                            .bearing(0).tilt(0.0f).zoom(mMap.getCameraPosition().zoom).build();
+                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(currentPlace));
+                }
+                previousLocation = location;
                 if (!gpsEnabled)
                     locationChange(location);                  //disable location from map if gps provider is able to detect location
                 MapUtils.updateOnlineUsers();   //update marker positions from main thread (not positionthread)
