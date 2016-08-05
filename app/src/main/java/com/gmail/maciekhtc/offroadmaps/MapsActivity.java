@@ -280,7 +280,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mMap.animateCamera(CameraUpdateFactory.newCameraPosition(currentPlace));
                 }
                 double distance = PointUtils.calculateDistance(MapUtils.latlngFromLocation(previousLocation),MapUtils.latlngFromLocation(location));
-                if (distance > 15 && distance != 1000)
+                if (distance > 10 && distance != 1000)
                     previousLocation = location;
                 if (!gpsEnabled)
                     locationChange(location);                  //disable location from map if gps provider is able to detect location
