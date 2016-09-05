@@ -50,7 +50,7 @@ public class PointUtils {
     }
 
     public static void processNewPoint(Location location) {
-        //Log.d("OffroadMap", "Process point");
+        Log.d("OffroadMap", "ProcessPoint start");
         LatLng newPoint = MapUtils.latlngFromLocation(location);
         boolean addFlag = true;
         //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
@@ -87,6 +87,7 @@ public class PointUtils {
                 modPoint = modifyPoint(bestPoint, newPoint);
                 if (Settings.saveNewPoints) newPoints.set((startIndex+indexDelta), modPoint);
                 addFlag=false;
+                Log.d("OffroadMap", "ProcessPoint not added");
                 break;
             }
         }
@@ -124,6 +125,7 @@ public class PointUtils {
                         if (Settings.saveNewPoints && flag) {
                             modPoint = modifyPoint(bestPoint, newPoint);
                             line.set((startIndex+indexDelta), modPoint);
+                            Log.d("OffroadMap", "ProcessPoint modified");
                         }
                         addFlag=false;
                         break;
@@ -138,6 +140,7 @@ public class PointUtils {
         }
         if (addFlag && Settings.saveNewPoints) newPoints.add(newPoint);
         lineEnded = !addFlag;
+        Log.d("OffroadMap","ProcessPoint ok");
     }
 
     public static double calculateDistance(LatLng loc1, LatLng loc2)
