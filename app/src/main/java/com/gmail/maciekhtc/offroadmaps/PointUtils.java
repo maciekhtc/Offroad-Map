@@ -19,7 +19,7 @@ public class PointUtils {
     public static boolean linesReady = false;
     public static ArrayList<LatLng> newPoints = new ArrayList();
     public static ArrayList<LatLng> junctionPoints = new ArrayList();
-    public static final double limitValue = 4.0;
+    public static final double limitValue = 6.0;
     private static boolean lineEnded = true;
     private static LatLng modPoint = null;
 
@@ -55,7 +55,7 @@ public class PointUtils {
         boolean addFlag = true;
         //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
         int newPointsSize = newPoints.size();
-        for (int index = newPointsSize-3; index>=0; index--) //check all without last 2 added point, in reverse to find last matching point faster when standing still
+        for (int index = newPointsSize-2; index>=0; index--) //check all without last 2 added point, in reverse to find last matching point faster when standing still
         {                                           //without last added because it will help making points closer to each other still with no error
                             //changed start index from size-2 to size-3, to try record more points
             LatLng point = newPoints.get(index);
@@ -98,7 +98,7 @@ public class PointUtils {
                 ArrayList<LatLng> line = lines.get(lineId);
                 for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
                 {
-                    if (calculateDistance(existingPoint,newPoint)<limitValue*0.3)
+                    if (calculateDistance(existingPoint,newPoint)<limitValue)     //from 0.3 to 1
                     {
                         int startIndex = line.indexOf(existingPoint);
                         LatLng bestPoint = existingPoint;
