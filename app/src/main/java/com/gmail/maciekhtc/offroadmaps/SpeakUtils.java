@@ -88,7 +88,7 @@ public class SpeakUtils {
     private static void roadCross() {
         if (!watchOut)
         {
-            tts.speak("Uważaj!", TextToSpeech.QUEUE_ADD, null);
+            //tts.speak("Uważaj!", TextToSpeech.QUEUE_ADD, null);
             watchOut = true;
         }
     }
