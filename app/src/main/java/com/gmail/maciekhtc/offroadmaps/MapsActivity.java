@@ -64,6 +64,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Polyline currentLine = null;
     ArrayList<LatLng> currentLinePoints = null;
     boolean gpsEnabled = false;
+    private LocationManager locationManager;
     private int accuracyGood = 0;
     private Location previousLocation;
     private int mapHeight;
@@ -78,16 +79,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             positionThread.running = false;
             FileUtils.fileWriteSettings();
             FileUtils.fileWriteLines();
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            locationManager.removeUpdates(this);
             super.onBackPressed();
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(0);
+            //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            //android.os.Process.killProcess(android.os.Process.myPid());
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
@@ -176,7 +189,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (PointUtils.lines==null) PointUtils.getLines(PointUtils.pointsFromFile(FileUtils.fileInit()));
         loadSettings();
         //
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         //gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
