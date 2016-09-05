@@ -202,7 +202,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d("OffroadMap","No PERMISSIONS");
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 6, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, this);
         //
         SpeakUtils.tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
@@ -274,13 +274,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onMyLocationChange(Location location) {
                 float zoomLevel = mMap.getCameraPosition().zoom;
                 if (zoomLevel < 12) zoomLevel = 16;
+                double distance = PointUtils.calculateDistance(MapUtils.latlngFromLocation(previousLocation),MapUtils.latlngFromLocation(location));
                 if (Settings.followMyPosition) {
                     /*Point screenLocation = mMap.getProjection().toScreenLocation(MapUtils.latlngFromLocation(location));
                     screenLocation.y -= mapHeight/2;
                     LatLng offsetTarget = mMap.getProjection().fromScreenLocation(screenLocation);*/
                     //mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)),100,null);
                     float bearing = 0;
-                    if (previousLocation != null) bearing = previousLocation.bearingTo(location);
+                    if (previousLocation != null && distance > 10 && distance != 1000) bearing = previousLocation.bearingTo(location);
                     CameraPosition currentPlace = new CameraPosition.Builder()
                             .target(MapUtils.latlngFromLocation(location))
                             .bearing(bearing).tilt(65.5f).zoom(zoomLevel).build();
@@ -292,8 +293,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .bearing(0).tilt(0.0f).zoom(mMap.getCameraPosition().zoom).build();
                     mMap.animateCamera(CameraUpdateFactory.newCameraPosition(currentPlace));
                 }
-                double distance = PointUtils.calculateDistance(MapUtils.latlngFromLocation(previousLocation),MapUtils.latlngFromLocation(location));
-                if (distance > 10 && distance != 1000)
+                if (distance > 10)  //&& distance != 1000
                     previousLocation = location;
                 if (!gpsEnabled)
                     locationChange(location);                  //disable location from map if gps provider is able to detect location
