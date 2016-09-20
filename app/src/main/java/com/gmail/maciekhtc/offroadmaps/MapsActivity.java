@@ -68,6 +68,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int accuracyGood = 0;
     private Location previousLocation;
     private int mapHeight;
+    private float bearing = 0;
 //http://student.pwsz.elblag.pl/~15936/OffroadMap/getUsers.php?deviceId=User32323211dsf&username=inny&lat=54.1752883&lon=19.4068716&group=fornewones&msg=empty
 
     @Override
@@ -280,7 +281,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     screenLocation.y -= mapHeight/2;
                     LatLng offsetTarget = mMap.getProjection().fromScreenLocation(screenLocation);*/
                     //mMap.animateCamera(CameraUpdateFactory.newLatLng(MapUtils.latlngFromLocation(location)),100,null);
-                    float bearing = 0;
                     if (previousLocation != null && distance > 10 && distance != 1000) bearing = previousLocation.bearingTo(location);
                     CameraPosition currentPlace = new CameraPosition.Builder()
                             .target(MapUtils.latlngFromLocation(location))
