@@ -98,7 +98,7 @@ public class PointUtils {
                 ArrayList<LatLng> line = lines.get(lineId);
                 for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
                 {
-                    if (calculateDistance(existingPoint,newPoint)<limitValue)     //from 0.3 to 1
+                    if (calculateDistance(existingPoint,newPoint)<limitValue*0.5)     //from 0.3 to 1
                     {
                         int startIndex = line.indexOf(existingPoint);
                         LatLng bestPoint = existingPoint;
