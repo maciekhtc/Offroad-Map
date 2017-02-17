@@ -64,7 +64,7 @@ public class PositionThread extends Thread {
                 }
             }
             try {
-                Thread.sleep(3000); //wait 3 sec each refresh
+                Thread.sleep(5000); //wait 3 sec each refresh
                 if (!running) break;        //exit statement
             } catch (InterruptedException e) {
                 e.printStackTrace();
