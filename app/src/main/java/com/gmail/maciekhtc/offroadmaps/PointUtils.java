@@ -19,7 +19,7 @@ public class PointUtils {
     public static boolean linesReady = false;
     public static ArrayList<LatLng> newPoints = new ArrayList();
     public static ArrayList<LatLng> junctionPoints = new ArrayList();
-    public static final double limitValue = 6.0;
+    public static final double limitValue = 6.0;//6
     private static boolean lineEnded = true;
     private static LatLng modPoint = null;
 
@@ -50,7 +50,7 @@ public class PointUtils {
     }
 
     public static void processNewPoint(Location location) {
-        Log.d("OffroadMap", "ProcessPoint start");
+        //Log.d("OffroadMap", "ProcessPoint start");
         LatLng newPoint = MapUtils.latlngFromLocation(location);
         boolean addFlag = true;
         //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
@@ -75,7 +75,7 @@ public class PointUtils {
                 int indexDelta=0;
                 for (int i=1;i<30;i++)
                 {
-                    if (startIndex+i>=newPointsSize) break;
+                    if (startIndex+i >= newPointsSize) break;
                     if (calculateDistance(bestPoint,newPoint) > calculateDistance(newPoints.get(startIndex+i),newPoint))
                     {
                         bestPoint=newPoints.get(startIndex+i);
@@ -84,10 +84,11 @@ public class PointUtils {
                 }
                 //do not speak for 5 latest added points
                 if (Settings.speakCorners && ((startIndex+indexDelta)<(newPointsSize-5))) SpeakUtils.newPosition((startIndex+indexDelta), newPoints);
-                modPoint = modifyPoint(bestPoint, newPoint);
-                if (Settings.saveNewPoints) newPoints.set((startIndex+indexDelta), modPoint);
+                //modPoint = modifyPoint(bestPoint, newPoint);
+                modPoint = bestPoint;
+                //if (Settings.saveNewPoints) newPoints.set((startIndex+indexDelta), modPoint);
                 addFlag=false;
-                Log.d("OffroadMap", "ProcessPoint not added");
+                Log.d("OffroadMap", "ProcessPoint new modified");
                 break;
             }
         }
@@ -105,7 +106,7 @@ public class PointUtils {
                         int indexDelta=0;
                         for (int i=1;i<30;i++)
                         {
-                            if (startIndex+i>=line.size()) break;
+                            if (startIndex+i >= line.size()) break;
                             if (calculateDistance(bestPoint, newPoint) > calculateDistance(line.get(startIndex+i),newPoint))
                             {
                                 bestPoint=line.get(startIndex+i);
@@ -123,9 +124,10 @@ public class PointUtils {
                         }
                         if (Settings.speakCorners) SpeakUtils.newPosition((startIndex+indexDelta), line);
                         if (Settings.saveNewPoints && flag) {
-                            modPoint = modifyPoint(bestPoint, newPoint);
-                            line.set((startIndex+indexDelta), modPoint);
-                            Log.d("OffroadMap", "ProcessPoint modified");
+                            //modPoint = modifyPoint(bestPoint, newPoint);
+                            modPoint = bestPoint;
+                            //line.set((startIndex+indexDelta), modPoint);
+                            Log.d("OffroadMap", "ProcessPoint old modified");
                         }
                         addFlag=false;
                         break;
@@ -134,13 +136,15 @@ public class PointUtils {
                 if (!addFlag) break;
             }
         }
-        if ((addFlag == lineEnded) && Settings.saveNewPoints && modPoint!=null) {
+        if (addFlag && (addFlag == lineEnded) && Settings.saveNewPoints && modPoint!=null) {
             newPoints.add(modPoint);
             junctionPoints.add(modPoint);
         }
-        if (addFlag && Settings.saveNewPoints) newPoints.add(newPoint);
+        if (addFlag && Settings.saveNewPoints){
+            newPoints.add(newPoint);
+            Log.d("OffroadMap","ProcessPoint added");
+        }
         lineEnded = !addFlag;
-        Log.d("OffroadMap","ProcessPoint ok");
     }
 
     public static double calculateDistance(LatLng loc1, LatLng loc2)
