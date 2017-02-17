@@ -69,6 +69,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location previousLocation;
     private int mapHeight;
     private float bearing = 0;
+    private final int req = 101;
+    private final int req2 = 102;
+    private boolean permissionsGranted = true;
 //http://student.pwsz.elblag.pl/~15936/OffroadMap/getUsers.php?deviceId=User32323211dsf&username=inny&lat=54.1752883&lon=19.4068716&group=fornewones&msg=empty
 
     @Override
@@ -81,16 +84,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             FileUtils.fileWriteSettings();
             FileUtils.fileWriteLines();
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
                 // here to request the missing permissions, and then overriding
                 //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
                 //                                          int[] grantResults)
                 // to handle the case where the user grants the permission. See the documentation
                 // for ActivityCompat#requestPermissions for more details.
+                Log.d("OffroadMap","No PERMISSIONS");
                 return;
             }
-            locationManager.removeUpdates(this);
+            if (locationManager != null && permissionsGranted) locationManager.removeUpdates(this);
             super.onBackPressed();
             System.exit(0);
             //getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -109,8 +112,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         //
         Display display = getWindowManager().getDefaultDisplay();
@@ -187,23 +189,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     FileUtils.filePath));
         }
 
-        if (PointUtils.lines==null) PointUtils.getLines(PointUtils.pointsFromFile(FileUtils.fileInit()));
-        loadSettings();
-        //
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        //gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            Log.d("OffroadMap","No PERMISSIONS");
-            return;
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, this);
         //
         SpeakUtils.tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
@@ -218,7 +203,80 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
+
+        //
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissionsGranted = false;
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION}, req);
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+               //public void onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults);
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Log.d("OffroadMap","No PERMISSIONS");
+            return;
+        }
+        if (permissionsGranted) {
+            requestLocationUpdates();
+        }
+        //
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE}, req2);
+        }
+        else {
+            readFiles();
+        }
+
     }
+    private void readFiles() {
+        if (PointUtils.lines == null)
+            PointUtils.getLines(PointUtils.pointsFromFile(FileUtils.fileInit()));
+        loadSettings();
+
+    }
+
+    private void requestLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //second check only needed for Android Studio IDE
+        }
+        permissionsGranted = true;
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, this);
+        //gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case req:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    //granted
+                    requestLocationUpdates();
+                } else {
+                    //not granted
+                    System.exit(0);
+                }
+                break;
+            case req2:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    //granted
+                    readFiles();
+                } else {
+                    //not granted
+                    System.exit(0);
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+
+
 
     private void saveSettings() {
         Settings.username = usernameText.getText().toString();
@@ -258,7 +316,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MapUtils.mMap = this.mMap;
         //mMap.moveCamera(CameraUpdateFactory.zoomTo(18));
         //
-        mMap.setMyLocationEnabled(true);
+        if (permissionsGranted) mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         mMap.getUiSettings().setTiltGesturesEnabled(false);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -329,6 +387,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         {
             mMap.addPolyline(new PolylineOptions().addAll(line).color(Color.WHITE).width(4.5f));
         }
+        currentLine=mMap.addPolyline(new PolylineOptions().color(Color.RED).width(5.0f));
+        if (currentLinePoints != null) currentLine.setPoints(currentLinePoints);   //draw red line from points
     }
 
     /**
@@ -376,6 +436,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onLocationChanged(Location location) {
         gpsEnabled = true;
+        //if (permissionsGranted) mMap.setMyLocationEnabled(true);
         if (location != null) locationChange(location);
         else gpsEnabled = false;
     }
@@ -387,7 +448,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onProviderEnabled(String provider) {
-        if (provider.contentEquals(LocationManager.GPS_PROVIDER)) gpsEnabled = true;
+        if (provider.contentEquals(LocationManager.GPS_PROVIDER))
+        {
+            if (permissionsGranted) mMap.setMyLocationEnabled(true);
+            gpsEnabled = true;
+        }
     }
 
     @Override
