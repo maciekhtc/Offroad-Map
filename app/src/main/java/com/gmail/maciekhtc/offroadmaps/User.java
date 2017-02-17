@@ -61,10 +61,13 @@ public class User {
         if (toDelete)
         {
             //toDelete == true so i can speak about user disconnected
-            if (Settings.speakMessages) SpeakUtils.tts.speak("Znikł: "+username, TextToSpeech.QUEUE_ADD, null);
-            this.marker.setVisible(false);
-            this.marker.remove();
-            this.marker = null;
+            if (marker != null) {
+                if (Settings.speakMessages) SpeakUtils.tts.speak("Znikł: "+username, TextToSpeech.QUEUE_ADD, null);
+                this.marker.setVisible(false);
+                this.marker.remove();
+                this.marker = null;
+                toDelete = false;
+            }
             Log.d("OffroadMap", "Removed online user " + username);
             return;
         }
