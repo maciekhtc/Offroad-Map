@@ -55,13 +55,14 @@ public class PointUtils {
         boolean addFlag = true;
         //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
         int newPointsSize = newPoints.size();
-        for (int index = newPointsSize-2; index>=0; index--) //check all without last 2 added point, in reverse to find last matching point faster when standing still
-        {                                           //without last added because it will help making points closer to each other still with no error
-                            //changed start index from size-2 to size-3, to try record more points
+        for (int index = newPointsSize-1; index>=0; index--) //check all, in reverse to find last matching point faster when standing still
+        {
             LatLng point = newPoints.get(index);
             if (calculateDistance(point,newPoint)<limitValue*0.3)
             {
+                //to powinno byc przed petla? ale przy wyszukiwaniu posrod wszystkich punktow nawet tych ostatnich to nie ma znaczenia:
                 //prevent recording points when started going back
+                /*
                 if ((calculateDistance(newPoint,newPoints.get(newPointsSize-2)) <
                         calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2))) &&
                         calculateDistance(newPoints.get(newPointsSize-1),newPoints.get(newPointsSize-2)) < limitValue*0.3)
@@ -69,6 +70,7 @@ public class PointUtils {
                     addFlag = false;
                     break;
                 }
+                */
                 //
                 int startIndex = newPoints.indexOf(point);
                 LatLng bestPoint = point;
