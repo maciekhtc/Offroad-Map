@@ -16,7 +16,7 @@ import java.util.Random;
  * Created by 15936 on 12.06.2016.
  */
 public class User {
-    public long lastTime;
+    //public long lastTime;
     public String username;
     public double lat;
     public double lon;
@@ -27,7 +27,7 @@ public class User {
     //
 
     public User (String lastTime, String username, String lat, String lon, String msg) {
-        this.lastTime = Long.parseLong(lastTime);
+        //this.lastTime = Long.parseLong(lastTime);
         this.username = Uri.decode(username);
         this.lat = Double.parseDouble(lat);
         this.lon = Double.parseDouble(lon);
@@ -40,7 +40,7 @@ public class User {
         MapUtils.toUpdate.add(this);
     }
     public void setParams (String lastTime, String username, String lat, String lon, String msg) {
-        this.lastTime = Long.parseLong(lastTime);
+        //this.lastTime = Long.parseLong(lastTime);
         this.username = username;
         this.lat = Double.parseDouble(lat);
         this.lon = Double.parseDouble(lon);
