@@ -101,7 +101,7 @@ public class PointUtils {
                 ArrayList<LatLng> line = lines.get(lineId);
                 for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
                 {
-                    if (calculateDistance(existingPoint,newPoint)<limitValue*0.5)     //from 0.3 to 1
+                    if (calculateDistance(existingPoint,newPoint)<limitValue*0.5)
                     {
                         int startIndex = line.indexOf(existingPoint);
                         LatLng bestPoint = existingPoint;
@@ -161,13 +161,13 @@ public class PointUtils {
     public static void getLines(ArrayList<LatLng> filePoints)
     {
         int count=0;
-        lines = new ArrayList();
+        lines = new ArrayList<>();
         Iterator<LatLng> filePointsIterator = filePoints.iterator();
         LatLng loc1 = null;
         if (filePointsIterator.hasNext()) loc1 = filePointsIterator.next();
         while (filePointsIterator.hasNext())
         {
-            ArrayList<LatLng> newLine = new ArrayList();
+            ArrayList<LatLng> newLine = new ArrayList<>();
             newLine.add(loc1);
             count++;
             boolean addNewLine = true;
@@ -297,7 +297,7 @@ public class PointUtils {
                                 Log.d("OffroadMap", "Add Junction " + bestPoint.toString());
                             }
                             junctionPoints.add(bestPoint);
-                            Log.d("OffroadMap", "Found junction " + bestPoint.toString());
+                            Log.d("OffroadMap", "Found Junction " + bestPoint.toString());
                             break;
                         } else if (calculateDistance(comparedPoint, line.get(line.size() - 1)) < limitValue) {
                             int startIndex = comparedLine.indexOf(comparedPoint);
