@@ -42,7 +42,7 @@ public class PositionThread extends Thread {
     //
     public void run() {
         while (true) {
-            if (myLat != 0) {
+            if (myLat != 0 && Settings.updateOnline) {
                 try {
                     if (messageRepeat > 0) {
                         messageRepeat--;
@@ -64,7 +64,7 @@ public class PositionThread extends Thread {
                 }
             }
             try {
-                Thread.sleep(5000); //wait 3 sec each refresh
+                Thread.sleep(5000); //wait 5 sec each refresh
                 if (!running) break;        //exit statement
             } catch (InterruptedException e) {
                 e.printStackTrace();
