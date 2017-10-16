@@ -60,6 +60,7 @@ public class PointUtils {
     public static void processNewPoint(Location location) {
         //Log.d("OffroadMap", "ProcessPoint start");
         LatLng newPoint = MapUtils.latlngFromLocation(location);
+        float speed = location.getSpeed();
         boolean addFlag = true;
         //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
         int newPointsSize = newPoints.size();
@@ -132,7 +133,7 @@ public class PointUtils {
                                 break;
                             }
                         }
-                        if (Settings.speakCorners) SpeakUtils.newPosition((startIndex+indexDelta), line);
+                        if (Settings.speakCorners) SpeakUtils.newPosition(line.indexOf(bestPoint), line, (int)speed);
                         if (Settings.saveNewPoints && flag) {
                             //modPoint = modifyPoint(bestPoint, newPoint);
                             modPoint = bestPoint;

@@ -17,12 +17,13 @@ public class SpeakUtils {
     private static boolean watchOut = false;
     public static TextToSpeech tts;
     private static String cornerMessage="";
+    private static final int pointsAbove = 2/*1*/, pointsBelow = 6/*5*/, speedDivider = 20/*20*/;
 
-    public static void newPosition(int indexOfPoint, ArrayList<LatLng> currentLine)
+    public static void newPosition(int indexOfPoint, ArrayList<LatLng> currentLine, int speed)
     {
         try {
+            boolean junctionFlag = false;       //todo search in next few points not distance (dist to junction == 0)
             if (indexOfPoint != -1 && indexOfPoint < currentLine.size()) {
-                boolean junctionFlag = false;
                 for (LatLng junction : PointUtils.junctionPoints) {
                     if (PointUtils.calculateDistance(currentLine.get(indexOfPoint), junction) < 10) {
                         roadCross();
@@ -32,36 +33,68 @@ public class SpeakUtils {
                 }
                 watchOut = junctionFlag;
             }
-            //
-            if (currentLine == currentLineOld) {
-                if (indexOfPoint > indexOfPointOld) {   //moving to higher index
-                    if (currentLine.size() - 1 >= indexOfPoint + 8) {
-                        LatLng point1 = currentLine.get(indexOfPoint + 3);
-                        LatLng point2 = currentLine.get(indexOfPoint + 5);
-                        LatLng point3 = currentLine.get(indexOfPoint + 8);
-                        Log.d("OffroadMap", "moving to higher index");
-                        corner(calculateAngle(point1, point2, point3));
-                        //watchOut = false;
-                    } else {
-                        roadCross();
+            if (!junctionFlag) {
+                //
+                //done todo calculate index using speed
+
+                //done todo check multiple combination of points to calculate angles and compare them to choose the most narrow one
+                if (currentLine == currentLineOld) {
+                    if (indexOfPoint > indexOfPointOld) {   //moving to higher index
+                        if (currentLine.size() - 1 >= indexOfPoint + pointsBelow + (speed / speedDivider)) {
+
+                            int startIndex = indexOfPoint + pointsAbove + (speed / speedDivider);
+                            int endIndex = indexOfPoint + pointsBelow + (speed / speedDivider);
+
+                            double minAngle = 180;
+                            double tempAngle;
+                            for (int a = startIndex; a < endIndex; a++) {
+                                for (int b = a; b < endIndex; b++) {
+                                    tempAngle = PointUtils.calculateAngle(currentLine.get(startIndex),
+                                            currentLine.get(a),
+                                            currentLine.get(b));
+                                    if (minAngle > tempAngle) minAngle = tempAngle;
+                                }
+                            }
+                            corner(minAngle);
+
+                            watchOut = false;
+                        } else {
+                            roadCross();    //end of line while moving forward
+                        }
+                    } else if (indexOfPoint < indexOfPointOld) {   //moving to lower index
+                        if (0 <= indexOfPoint - (pointsBelow + (speed / speedDivider))) {
+
+                            int startIndex = indexOfPoint - (pointsAbove + (speed / speedDivider));
+                            int endIndex = indexOfPoint - (pointsBelow + (speed / speedDivider));
+
+                            double minAngle = 180;
+                            double tempAngle;
+                            for (int a = startIndex; a > endIndex; a--) {
+                                for (int b = a; b > endIndex; b--) {
+                                    tempAngle = PointUtils.calculateAngle(currentLine.get(startIndex),
+                                            currentLine.get(a),
+                                            currentLine.get(b));
+                                    if (minAngle > tempAngle) minAngle = tempAngle;
+                                }
+                            }
+                            corner(minAngle);
+
+                            /*
+                            LatLng point1 = currentLine.get(indexOfPoint - (1 + (speed / 10)));
+                            LatLng point2 = currentLine.get(indexOfPoint - (3 + (speed / 10)));
+                            LatLng point3 = currentLine.get(indexOfPoint - (5 + (speed / 10)));
+                            //Log.d("OffroadMap", "moving to lower index");
+                            corner(PointUtils.calculateAngle(point1, point2, point3));*/
+                            watchOut = false;
+                        } else {
+                            roadCross();    //end of line while moving backwards
+                        }
+                    } else {   //standing still
                     }
-                } else if (indexOfPoint < indexOfPointOld) {   //moving to lower index
-                    if (0 <= indexOfPoint - 8) {
-                        LatLng point1 = currentLine.get(indexOfPoint - 3);
-                        LatLng point2 = currentLine.get(indexOfPoint - 5);
-                        LatLng point3 = currentLine.get(indexOfPoint - 8);
-                        Log.d("OffroadMap", "moving to lower index");
-                        corner(calculateAngle(point1, point2, point3));
-                        //watchOut = false;
-                    } else {
-                        roadCross();
-                    }
-                } else {   //standing still
-                    //MapUtils.mMap.addMarker(new MarkerOptions().position(currentLine.get(indexOfPoint)));
+                } else {   //change line, road cross?
+                    //Log.d("OffroadMap", "Line change");
+                    roadCross();
                 }
-            } else {   //change line, road cross?
-                //Log.d("OffroadMap", "Line change");
-                roadCross();
             }
             //update positiond
             currentLineOld = currentLine;
@@ -72,17 +105,6 @@ public class SpeakUtils {
             e.printStackTrace();    //encountered one unexpected behaviour, happened only one time,
                                     // app was closed, dont know if crashed or cleaned from memory, will be investigated
         }
-    }
-
-    private static double calculateAngle(LatLng point1, LatLng point2, LatLng point3) {
-        if (point1==null||point2==null||point3==null) return 180;   //some kind of workaround for situation when a point is null?
-        double alpha = Math.atan2(point1.latitude - point2.latitude, point1.longitude - point2.longitude);
-        double beta = Math.atan2(point3.latitude-point2.latitude,point3.longitude-point2.longitude);
-        double result = Math.toDegrees(alpha)-Math.toDegrees(beta);
-        if (result > 180) result = -(360 - result);
-        else if (result < -180) result = (result + 360);
-        Log.d("OffroadMap", "Angle: " + result + " / " + point1.toString() + " " + point2.toString() + " " + point3.toString());
-        return result;
     }
 
     private static void roadCross() {
@@ -105,7 +127,12 @@ public class SpeakUtils {
             cornerAngle=-cornerAngle;
             message = "prawy ";
         }
-        if (cornerAngle < 5) message = "";  ///////
+
+
+
+        //todo stopien ciasnosci na bazie predkosci? chyba glupie
+        //
+        if (cornerAngle < 5) message = "";  ///////should not be used
         else if (cornerAngle < 70) message+="1";
         else if (cornerAngle < 110) message+="2";
         else if (cornerAngle < 135) message+="3";
@@ -113,10 +140,29 @@ public class SpeakUtils {
         else if (cornerAngle < 160) message+="5";
         else if (cornerAngle < 170) message+="6";
         else if (cornerAngle <= 180) message="";    //straight
-        else message="błąd";   //not needed ?
+        else message="";   //not needed ?
         if (!cornerMessage.contentEquals("")) watchOut=false;
-        if (!cornerMessage.contentEquals("")&&!message.contentEquals("")) message = "do " + message;
-        if (!message.contentEquals("")) tts.speak(message, TextToSpeech.QUEUE_ADD, null);
+        String messageToSay = message;
+        if (!cornerMessage.contentEquals("")&&!message.contentEquals(""))
+        {
+            if ((cornerMessage.contains("prawy") && message.contains("prawy")) || (cornerMessage.contains("lewy") && message.contains("lewy"))) {
+                try {
+                    int lastNumber = Integer.parseInt(cornerMessage.split(" ")[1]);
+                    int newNumber = Integer.parseInt(message.split(" ")[1]);
+                    if (lastNumber <= newNumber) messageToSay = "długi";        //todo: change to == ? to say every angle change not "długi"
+                    else messageToSay = "do " + newNumber;//narrow corner
+
+                } catch (Exception e) { }
+            }
+            else messageToSay = "do " + messageToSay;   //different corner direction
+        }
+        messageToSay = messageToSay.replaceAll("1", "jeden");
+        messageToSay = messageToSay.replaceAll("2", "dwa");
+        messageToSay = messageToSay.replaceAll("3", "trzy");
+        messageToSay = messageToSay.replaceAll("4", "cztery");
+        messageToSay = messageToSay.replaceAll("5", "pięć");
+        messageToSay = messageToSay.replaceAll("6", "sześć");
+        if (!message.contentEquals("")) tts.speak(messageToSay, TextToSpeech.QUEUE_ADD, null);
         cornerMessage = message;
     }
 }
