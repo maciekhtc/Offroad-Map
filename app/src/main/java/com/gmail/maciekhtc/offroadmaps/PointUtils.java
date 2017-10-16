@@ -31,6 +31,8 @@ public class PointUtils {
         {
             LatLngfromLine = line.split(":",2);
             filePoints.add(new LatLng(Double.parseDouble(LatLngfromLine[0]), Double.parseDouble(LatLngfromLine[1])));
+            // not needed, look below todo try catch for incomplete data indexOutOfBounds
+            // ok todo add temp file to prevent clearing points when app is forced to close while saving data, save to new file, replace files, delete one of them
         }
 //todo test
         //test();
@@ -42,6 +44,7 @@ public class PointUtils {
         //LatLng p2 = new LatLng(54.186148,19.4051505);
         Log.d("OffroadMap","test "+calculateDistanceTest(p1,p2)+" "+calculateDistance(p1,p2));
     }
+
 
     public static ArrayList<String> savePoints() {
         ArrayList<String> listString = new ArrayList();
@@ -64,10 +67,12 @@ public class PointUtils {
         boolean addFlag = true;
         //add only when not too near, only new points to generate new lines, hope it wont be longer than 5sec..
         int newPointsSize = newPoints.size();
+        LatLng lastPoint = null;
+        if (newPointsSize != 0 && !lineEnded) lastPoint = newPoints.get(newPointsSize-1);
         for (int index = newPointsSize-1; index>=0; index--) //check all, in reverse to find last matching point faster when standing still
         {
             LatLng point = newPoints.get(index);
-            if (calculateDistance(point,newPoint)<limitValue*0.3)
+            if (calculateDistance(point,newPoint)<limitValue*0.5)   //was 0.3
             {
                 //to powinno byc przed petla? ale przy wyszukiwaniu posrod wszystkich punktow nawet tych ostatnich to nie ma znaczenia:
                 //prevent recording points when started going back
@@ -80,24 +85,28 @@ public class PointUtils {
                     break;
                 }
                 */
+                //what? never observed, maybe search on different lines too? todo: ok but what if newPoint went further than bestPoint?
                 //
                 int startIndex = newPoints.indexOf(point);
                 LatLng bestPoint = point;
-                int indexDelta=0;
-                for (int i=1;i<30;i++)
+                double distanceAndAngleBest = calculateDistanceAndAngle(lastPoint,newPoint,bestPoint);
+                for (int i=1;i<10;i++)
                 {
-                    if (startIndex+i >= newPointsSize) break;
-                    if (calculateDistance(bestPoint,newPoint) > calculateDistance(newPoints.get(startIndex+i),newPoint))
+                    if (startIndex-i < 0) break;
+                    point = newPoints.get(startIndex-i);
+                    double distanceAndAngleCompared = calculateDistanceAndAngle(lastPoint,newPoint,point);
+                    if (distanceAndAngleBest > distanceAndAngleCompared)
                     {
-                        bestPoint=newPoints.get(startIndex+i);
-                        indexDelta=i;
+                        bestPoint = point;
+                        distanceAndAngleBest = distanceAndAngleCompared;
                     }
                 }
                 //do not speak for 5 latest added points
-                if (Settings.speakCorners && ((startIndex+indexDelta)<(newPointsSize-5))) SpeakUtils.newPosition((startIndex+indexDelta), newPoints);
+                if (Settings.speakCorners && ((newPointsSize - newPoints.indexOf(bestPoint)) > 6))
+                    SpeakUtils.newPosition(newPoints.indexOf(bestPoint), newPoints, (int)speed);
                 //modPoint = modifyPoint(bestPoint, newPoint);
                 modPoint = bestPoint;
-                //if (Settings.saveNewPoints) newPoints.set((startIndex+indexDelta), modPoint);
+                //if (Settings.saveNewPoints) newPoints.set(newPoints.indexOf(bestPoint), modPoint);
                 addFlag=false;
                 Log.d("OffroadMap", "ProcessPoint new modified");
                 break;
@@ -108,20 +117,22 @@ public class PointUtils {
             for (int lineId = lines.size()-1; lineId>=0 ;lineId--)
             {
                 ArrayList<LatLng> line = lines.get(lineId);
-                for (LatLng existingPoint:line)     //maybe iterate by index to fix problem with modification of point
+                for (LatLng existingPoint:line)
                 {
                     if (calculateDistance(existingPoint,newPoint)<limitValue*0.5)
                     {
                         int startIndex = line.indexOf(existingPoint);
                         LatLng bestPoint = existingPoint;
-                        int indexDelta=0;
-                        for (int i=1;i<30;i++)
+                        double distanceAndAngleBest = calculateDistanceAndAngle(lastPoint,newPoint,bestPoint);
+                        for (int i=1;i<10;i++)
                         {
                             if (startIndex+i >= line.size()) break;
-                            if (calculateDistance(bestPoint, newPoint) > calculateDistance(line.get(startIndex+i),newPoint))
+                            existingPoint = line.get(startIndex + i);
+                            double distanceAndAngleCompared = calculateDistanceAndAngle(lastPoint,newPoint,existingPoint);
+                            if (distanceAndAngleBest > distanceAndAngleCompared)
                             {
-                                bestPoint=line.get(startIndex+i);
-                                indexDelta=i;
+                                bestPoint = existingPoint;
+                                distanceAndAngleBest = distanceAndAngleCompared;
                             }
                         }
                         boolean flag = true;
@@ -137,7 +148,7 @@ public class PointUtils {
                         if (Settings.saveNewPoints && flag) {
                             //modPoint = modifyPoint(bestPoint, newPoint);
                             modPoint = bestPoint;
-                            //line.set((startIndex+indexDelta), modPoint);
+                            //line.set(line.indexOf(bestPoint), modPoint);
                             Log.d("OffroadMap", "ProcessPoint old modified");
                         }
                         addFlag=false;
@@ -147,14 +158,29 @@ public class PointUtils {
                 if (!addFlag) break;
             }
         }
-        if (addFlag && (addFlag == lineEnded) && Settings.saveNewPoints && modPoint!=null) {
-            newPoints.add(modPoint);
-            junctionPoints.add(modPoint);
+
+        if (!addFlag && !lineEnded && Settings.saveNewPoints && modPoint!=null && newPointsSize >=2) {
+            if (Math.abs(calculateAngle(newPoints.get(newPointsSize-2),newPoints.get(newPointsSize-1),modPoint)) >= 30) {   //not newPoint because its too near modPoint
+                newPoints.add(modPoint);
+                junctionPoints.add(modPoint);
+                Log.d("OffroadMap","ProcessPoint Junction added");
+            }
         }
-        if (addFlag && Settings.saveNewPoints){
+
+        //temp: add junction only for this session, inaccurate?
+        if (addFlag && lineEnded && Settings.saveNewPoints && modPoint!=null) {
+            junctionPoints.add(modPoint);
+            //newPoints.add(modPoint);
+
+            //not needed for temporary method, done in reading from file (optimize) todo calculate angle with lastPoint??
+            Log.d("OffroadMap", "ProcessPoint junction added");
+        }
+
+        if (addFlag && !lineEnded && Settings.saveNewPoints){
             newPoints.add(newPoint);
             Log.d("OffroadMap","ProcessPoint added");
         }
+
         lineEnded = !addFlag;
     }
 
@@ -315,7 +341,7 @@ public class PointUtils {
                 }
             }
             if (!keepConcatenatedLine) lines.remove(lineToConcatenateSecondTime);
-            if (addNewLine) lines.add(newLine);
+            if (addNewLine && newLine.size() > 1) lines.add(newLine);
         }
         optimizeLines();
         linesReady = true;
@@ -328,6 +354,8 @@ public class PointUtils {
         double newLongitude = ((existingPoint.longitude * (1 - factor)) + (newPoint.longitude * factor));
         return new LatLng(newLatitude,newLongitude);
     }
+
+
     private static void optimizeLines()
     {
         //add junction points
@@ -338,7 +366,8 @@ public class PointUtils {
             for (ArrayList<LatLng> comparedLine : lines) {
                 for (int indexOfComparedPoint = 0;indexOfComparedPoint<comparedLine.size();indexOfComparedPoint++) {
                     LatLng comparedPoint = comparedLine.get(indexOfComparedPoint);
-                    if (!(comparedLine==line && (indexOfComparedPoint > comparedLine.size()-8 || indexOfComparedPoint < 8))) {
+                    //&& ((indexOfComparedPoint > comparedLine.size()-5) || (indexOfComparedPoint < 5))  ind = 15     size = 100
+                    if (!((comparedLine==line) && ((indexOfComparedPoint > (comparedLine.size()-5)) || (indexOfComparedPoint < 5)))) {
                         if (calculateDistance(comparedPoint, line.get(0)) < limitValue) {
                             int startIndex = comparedLine.indexOf(comparedPoint);
                             LatLng bestPoint = comparedPoint;
@@ -366,11 +395,13 @@ public class PointUtils {
                             }
                             if (calculateDistance(bestPoint, line.get(line.size() - 1)) != 0) {
                                 line.add(bestPoint);
-                                Log.d("OffroadMap", "Add Junction " + bestPoint.toString());
+                                Log.d("OffroadMap", "add junction " + bestPoint.toString());
                             }
                             junctionPoints.add(bestPoint);
-                            Log.d("OffroadMap", "Found Junction " + bestPoint.toString());
+                            Log.d("OffroadMap", "found junction " + bestPoint.toString());
                             break;
+
+
                         }
                     }
                     else break;
