@@ -82,18 +82,35 @@ public class FileUtils {
             }
             //Log.d("OffroadMap", "Files loaded");
         } catch (FileNotFoundException e1) {
-            //No file
+            //No file Map.txt
             //Log.d("OffroadMap", "No map file");
             try {
-                new File(filePath).mkdirs();
-                FileWriter fileWriter = new FileWriter(filePath + "Map.txt", true);
-                //Log.d("OffroadMap", "File map created");
-                fileWriter.write("#Offroad Map points list, you can share this list with others\r\n");
-                fileWriter.close();
-                //Log.d("OffroadMap", "File header write ended");
+                BufferedReader mapBr = new BufferedReader(new FileReader(filePath + "MapTemp.txt"));
+                String line = "";
+                while ((line = mapBr.readLine()) != null) {
+                    if (!line.startsWith("#")) {
+                        listString.add(new String(line));
+
+                    }
+                }
+                //Log.d("OffroadMap", "Files loaded");
+            }   catch (FileNotFoundException e2) {
+                //No file MapTemp.txt too
+                try {
+                    new File(filePath).mkdirs();
+                    FileWriter fileWriter = new FileWriter(filePath + "Map.txt", true);
+                    //Log.d("OffroadMap", "File map created");
+                    fileWriter.write("#Offroad Map points list, you can share this list with others\r\n");
+                    fileWriter.close();
+                    //Log.d("OffroadMap", "File header write ended");
+                } catch (IOException e) {
+                    //IOException
+                    //Log.d("OffroadMap", "Can not create file");
+                    e.printStackTrace();
+                }
+
             } catch (IOException e) {
                 //IOException
-                //Log.d("OffroadMap", "Can not create file");
                 e.printStackTrace();
             }
         } catch (IOException e) {
@@ -106,13 +123,18 @@ public class FileUtils {
 
     public static void fileWriteLines() {
         try {
-            FileWriter fileWriter = new FileWriter(filePath + "Map.txt", false);
+            FileWriter fileWriter = new FileWriter(filePath + "MapTemp.txt", false);
             //Log.d("OffroadMap", "File opened for append");
             fileWriter.write("#Offroad Map points list, you can share this list with others" + "\r\n");
             for (String line : PointUtils.savePoints()) {
                 fileWriter.write(line + "\r\n");
             }
             fileWriter.close();
+            File newFile = new File(filePath + "Map.txt");
+            File oldFile = new File(filePath + "MapTemp.txt");
+            if (newFile.exists())
+                newFile.delete();
+            oldFile.renameTo(newFile);
             Log.d("OffroadMap", "File filled with new lines");
         } catch (IOException e) {
             //IOException
