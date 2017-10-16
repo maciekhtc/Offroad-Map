@@ -19,7 +19,7 @@ public class PointUtils {
     public static boolean linesReady = false;
     public static ArrayList<LatLng> newPoints = new ArrayList();
     public static ArrayList<LatLng> junctionPoints = new ArrayList();
-    public static final double limitValue = 6.0;//6
+    public static final double limitValue = 110.0;   //80   //6 on v2
     private static boolean lineEnded = true;
     private static LatLng modPoint = null;
 
@@ -32,7 +32,15 @@ public class PointUtils {
             LatLngfromLine = line.split(":",2);
             filePoints.add(new LatLng(Double.parseDouble(LatLngfromLine[0]), Double.parseDouble(LatLngfromLine[1])));
         }
+//todo test
+        //test();
         return filePoints;
+    }
+    public static void test(){
+        LatLng p1 = new LatLng(54.1863493,19.4057058);
+        LatLng p2 = new LatLng(54.1863213,19.4068428);
+        //LatLng p2 = new LatLng(54.186148,19.4051505);
+        Log.d("OffroadMap","test "+calculateDistanceTest(p1,p2)+" "+calculateDistance(p1,p2));
     }
 
     public static ArrayList<String> savePoints() {
@@ -149,14 +157,61 @@ public class PointUtils {
         lineEnded = !addFlag;
     }
 
+    public static double calculateDistanceTest(LatLng loc1, LatLng loc2)
+    {
+        if (loc1 == null || loc2 == null) return 1000;
+        //v1
+        //return result=Math.sqrt((loc2.latitude*20000 - loc1.latitude*20000) * (loc2.latitude*20000 - loc1.latitude*20000))+((loc2.longitude*10000 - loc1.longitude*10000) * (loc2.longitude*10000 - loc1.longitude*10000));
+        //float result[] = new float[1]; Location.distanceBetween(loc1.latitude,loc1.longitude,loc2.latitude,loc2.longitude,result); return result[0];
+        //v2
+        //double x = (loc2.longitude - loc1.longitude) * Math.cos((loc1.latitude + loc2.latitude) / 2);
+        //double y = (loc2.latitude - loc1.latitude);
+        //return Math.sqrt(x * x + y * y) * 6371;
+        //v3
+        float distance[] = new float[1];
+        Location.distanceBetween(loc1.latitude,loc1.longitude,loc2.latitude,loc2.longitude,distance);
+        return distance[0];
+        //v4
+        //double rlat1 = Math.PI * loc1.latitude/180;
+        //double rlat2 = Math.PI * loc2.latitude/180;
+        //double rtheta = Math.PI * (loc1.longitude-loc2.longitude) / 180;
+        //double dist = Math.sin(Math.PI * loc1.latitude/180) * Math.sin(Math.PI * loc2.latitude/180) +
+        // Math.cos(Math.PI * loc1.latitude/180) * Math.cos(Math.PI * loc2.latitude/180) * Math.cos(rtheta);
+        //dist = Math.acos(dist) * 180/Math.PI * 60 * 1.1515 * 1.609344;
+    }
     public static double calculateDistance(LatLng loc1, LatLng loc2)
     {
         if (loc1 == null || loc2 == null) return 1000;
-        //return result=Math.sqrt((loc2.latitude*20000 - loc1.latitude*20000) * (loc2.latitude*20000 - loc1.latitude*20000))+((loc2.longitude*10000 - loc1.longitude*10000) * (loc2.longitude*10000 - loc1.longitude*10000));
-        //float result[] = new float[1]; Location.distanceBetween(loc1.latitude,loc1.longitude,loc2.latitude,loc2.longitude,result); return result[0];
-        double x = (loc2.longitude - loc1.longitude) * Math.cos((loc1.latitude + loc2.latitude) / 2);
-        double y = (loc2.latitude - loc1.latitude);
-        return Math.sqrt(x * x + y * y) * 6371;
+        double rlat1 = Math.PI * loc1.latitude/180;
+        double rlat2 = Math.PI * loc2.latitude/180;
+        double rtheta = Math.PI * (loc1.longitude-loc2.longitude) / 180;
+        double dist = Math.sin(Math.PI * loc1.latitude/180) * Math.sin(Math.PI * loc2.latitude/180) +
+                        Math.cos(Math.PI * loc1.latitude/180) * Math.cos(Math.PI * loc2.latitude/180) * Math.cos(rtheta);
+        dist = Math.acos(dist) * 180/Math.PI * 60 * 1.1515 * 1.609344 * 1000;
+        return dist;
+    }
+    public static double calculateAngle(LatLng point1, LatLng point2, LatLng point3) {
+        if (point1==null||point2==null||point3==null) return 180;   //some kind of workaround for situation when a point is null?
+
+        //calculate direction
+        double alpha = Math.atan2(2*point1.latitude - 2*point2.latitude, point1.longitude - point2.longitude);
+        double beta = Math.atan2(2*point3.latitude - 2*point2.latitude,point3.longitude-point2.longitude);
+        double dir = Math.toDegrees(alpha)-Math.toDegrees(beta);
+        if (dir > 180) dir = -(360 - dir);
+        else if (dir < -180) dir = (dir + 360);
+        boolean isNegative = dir < 0;
+        //calculate absolute angle
+        double a = calculateDistance(point1,point2);
+        double b = calculateDistance(point2,point3);
+        double c = calculateDistance(point1,point3);
+        if (a == 0 || b == 0 || c == 0
+                || a >= limitValue) return 180;
+        double result = Math.toDegrees(Math.acos((Math.pow(a, 2)+Math.pow(b, 2)-Math.pow(c, 2))/(2*a*b)));
+        if (isNegative) result = -result;   //apply direction to the angle
+        if (result > 180) result = -(360 - result);     //probably not needed after changing mathematics base
+        else if (result < -180) result = (result + 360);
+        System.out.println("Angle: " + result + " / " + point1.toString() + " " + point2.toString() + " " + point3.toString());
+        return result;
     }
     public static void getLines(ArrayList<LatLng> filePoints)
     {
