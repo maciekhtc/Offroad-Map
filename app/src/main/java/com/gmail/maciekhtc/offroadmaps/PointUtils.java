@@ -355,6 +355,13 @@ public class PointUtils {
         return new LatLng(newLatitude,newLongitude);
     }
 
+    private static double calculateDistanceAndAngle(LatLng p1, LatLng p2, LatLng p3) {
+        if (p1 != null)
+        {
+            return calculateDistance(p2,p3) + (((180 - Math.abs(calculateAngle(p1,p2,p3)))/180)*(limitValue/2));
+        }
+        return calculateDistance(p2,p3);
+    }
 
     private static void optimizeLines()
     {
@@ -371,12 +378,17 @@ public class PointUtils {
                         if (calculateDistance(comparedPoint, line.get(0)) < limitValue) {
                             int startIndex = comparedLine.indexOf(comparedPoint);
                             LatLng bestPoint = comparedPoint;
-                            for (int i = 1; i < 30; i++) {
+                            double distanceAndAngleBest = calculateDistanceAndAngle(line.get(1),line.get(0),bestPoint);
+                            for (int i = 1; i < 10; i++) {
                                 if (startIndex + i >= comparedLine.size()) break;
-                                if (calculateDistance(bestPoint, line.get(0)) > calculateDistance(comparedLine.get(startIndex + i), line.get(0))) {
-                                    bestPoint = comparedLine.get(startIndex + i);
+                                comparedPoint = comparedLine.get(startIndex + i);
+                                double distanceAndAngleCompared = calculateDistanceAndAngle(line.get(1),line.get(0),comparedPoint);
+                                if (distanceAndAngleBest > distanceAndAngleCompared) {
+                                    bestPoint = comparedPoint;
+                                    distanceAndAngleBest = distanceAndAngleCompared;
                                 }
                             }
+                            //if (Math.abs(calculateAngle(line.get(1),line.get(0),bestPoint)) < 30) break;      //disable safety feature that prevented making junctions consisting of small angle
                             if (calculateDistance(bestPoint, line.get(0)) != 0) {
                                 line.add(0, bestPoint);
                                 Log.d("OffroadMap", "Add Junction " + bestPoint.toString());
@@ -387,12 +399,17 @@ public class PointUtils {
                         } else if (calculateDistance(comparedPoint, line.get(line.size() - 1)) < limitValue) {
                             int startIndex = comparedLine.indexOf(comparedPoint);
                             LatLng bestPoint = comparedPoint;
-                            for (int i = 0; i < 30; i++) {
+                            double distanceAndAngleBest = calculateDistanceAndAngle(line.get(line.size() - 2),line.get(line.size() - 1),bestPoint);
+                            for (int i = 1; i < 10; i++) {
                                 if (startIndex + i >= comparedLine.size()) break;
-                                if (calculateDistance(bestPoint, line.get(line.size() - 1)) > calculateDistance(comparedLine.get(startIndex + i), line.get(line.size() - 1))) {
-                                    bestPoint = comparedLine.get(startIndex + i);
+                                comparedPoint = comparedLine.get(startIndex + i);
+                                double distanceAndAngleCompared = calculateDistanceAndAngle(line.get(line.size() - 2),line.get(line.size() - 1),comparedPoint);
+                                if (distanceAndAngleBest > distanceAndAngleCompared) {
+                                    bestPoint = comparedPoint;
+                                    distanceAndAngleBest = distanceAndAngleCompared;
                                 }
                             }
+                            if (Math.abs(calculateAngle(line.get(line.size() - 2),line.get(line.size() - 1),bestPoint)) < 30) break;
                             if (calculateDistance(bestPoint, line.get(line.size() - 1)) != 0) {
                                 line.add(bestPoint);
                                 Log.d("OffroadMap", "add junction " + bestPoint.toString());
